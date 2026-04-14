@@ -17,10 +17,10 @@ export default function Home() {
   const isFavorite = (id: number) => favorites?.some(f => f.productId === id);
 
   // Unsplash images for sections
-  // Hero: Dynamic shoe action shot
-  const heroImage = "https://images.unsplash.com/photo-1556906781-9a412961d289?auto=format&fit=crop&q=80&w=2000"; 
+  // Hero: Dynamic shoe action shot - from assets
+  const heroImage = "/assets/hero.png";
   // Features: Clean minimal shoe
-  const featureImage = "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?auto=format&fit=crop&q=80&w=800";
+  const featureImage = "/assets/sale1.jpg";
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -65,29 +65,70 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section className="py-24 bg-card">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="flex flex-col items-center text-center space-y-4 p-8 rounded-2xl bg-secondary/30 hover:bg-secondary/50 transition-colors">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2">
-                <Truck className="w-8 h-8" />
+      <section className="py-32 bg-gradient-to-b from-background to-secondary/10 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute top-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 right-0 w-72 h-72 bg-accent/5 rounded-full blur-3xl translate-x-1/3 translate-y-1/3"></div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          {/* Section Header */}
+          <div className="text-center mb-16 space-y-4">
+            <span className="inline-block px-4 py-2 rounded-full bg-primary/10 text-primary font-bold text-sm tracking-wider">
+              WHY CHOOSE US
+            </span>
+            <h2 className="text-4xl md:text-5xl font-display font-black">Premium Service Guaranteed</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              We're committed to delivering excellence in every aspect of your shopping experience
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
+            {/* Feature 1 */}
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg"></div>
+              <div className="relative p-8 rounded-3xl bg-card border border-border/50 hover:border-primary/50 shadow-lg hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 h-full flex flex-col">
+                <div className="relative mb-6">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-2xl opacity-10 blur-xl group-hover:opacity-20 transition-opacity"></div>
+                  <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <Truck className="w-8 h-8 text-primary group-hover:text-accent transition-colors" />
+                  </div>
+                </div>
+                <h3 className="font-bold text-xl mb-3 group-hover:text-primary transition-colors">Free Shipping</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed flex-grow">On all orders over $150. International shipping available to 150+ countries.</p>
+                <div className="mt-4 text-primary text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity">Learn more →</div>
               </div>
-              <h3 className="font-bold text-xl">Free Shipping</h3>
-              <p className="text-muted-foreground">On all orders over $150. International shipping available.</p>
             </div>
-            <div className="flex flex-col items-center text-center space-y-4 p-8 rounded-2xl bg-secondary/30 hover:bg-secondary/50 transition-colors">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2">
-                <Shield className="w-8 h-8" />
+
+            {/* Feature 2 */}
+            <div className="group relative md:scale-105">
+              <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-accent/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg"></div>
+              <div className="relative p-8 rounded-3xl bg-gradient-to-br from-card to-card/50 border border-border/50 hover:border-accent/50 shadow-xl hover:shadow-2xl hover:shadow-accent/20 transition-all duration-300 h-full flex flex-col">
+                <div className="relative mb-6">
+                  <div className="absolute inset-0 bg-gradient-to-br from-accent to-primary rounded-2xl opacity-10 blur-xl group-hover:opacity-20 transition-opacity"></div>
+                  <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-accent/20 to-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <Shield className="w-8 h-8 text-accent group-hover:text-primary transition-colors" />
+                  </div>
+                </div>
+                <h3 className="font-bold text-xl mb-3 group-hover:text-accent transition-colors">Secure Payment</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed flex-grow">100% secure payment with 256-bit SSL encryption. Your data is always protected.</p>
+                <div className="mt-4 text-accent text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity">Learn more →</div>
               </div>
-              <h3 className="font-bold text-xl">Secure Payment</h3>
-              <p className="text-muted-foreground">100% secure payment with 256-bit encryption.</p>
             </div>
-            <div className="flex flex-col items-center text-center space-y-4 p-8 rounded-2xl bg-secondary/30 hover:bg-secondary/50 transition-colors">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2">
-                <RefreshCcw className="w-8 h-8" />
+
+            {/* Feature 3 */}
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg"></div>
+              <div className="relative p-8 rounded-3xl bg-card border border-border/50 hover:border-primary/50 shadow-lg hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 h-full flex flex-col">
+                <div className="relative mb-6">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-2xl opacity-10 blur-xl group-hover:opacity-20 transition-opacity"></div>
+                  <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <RefreshCcw className="w-8 h-8 text-primary group-hover:text-accent transition-colors" />
+                  </div>
+                </div>
+                <h3 className="font-bold text-xl mb-3 group-hover:text-primary transition-colors">30 Days Return</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed flex-grow">Not satisfied? Return it within 30 days for a full refund. No questions asked.</p>
+                <div className="mt-4 text-primary text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity">Learn more →</div>
               </div>
-              <h3 className="font-bold text-xl">30 Days Return</h3>
-              <p className="text-muted-foreground">Not satisfied? Return it within 30 days for a full refund.</p>
             </div>
           </div>
         </div>
@@ -122,12 +163,12 @@ export default function Home() {
 
       {/* Promotional Section */}
       <section className="py-24 bg-primary text-primary-foreground relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-1"></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="space-y-8">
+            <div className="space-y-6">
               <Badge className="bg-accent text-white hover:bg-accent/90 border-none px-4 py-1 text-sm">LIMITED OFFER</Badge>
-              <h2 className="text-5xl md:text-6xl font-display font-black leading-tight">
+              <h2 className="text-5xl md:text-6xl flex-wrap text-white leading-tight">
                 30% OFF <br />
                 SUMMER COLLECTION
               </h2>
@@ -144,7 +185,7 @@ export default function Home() {
               <img 
                 src={featureImage} 
                 alt="Promo Shoe" 
-                className="relative z-10 w-full rounded-3xl shadow-2xl transform rotate-[-12deg] hover:rotate-0 transition-transform duration-500" 
+                className="relative h-[500px] object-cover z-10 w-full rounded-3xl shadow-2xl transform rotate-[-12deg] hover:rotate-0 transition-transform duration-500" 
               />
             </div>
           </div>

@@ -76,7 +76,7 @@ export async function registerRoutes(
   // Seed Data
   const existingProducts = await storage.getProducts();
   if (existingProducts.length === 0) {
-    console.log("Seeding database...");
+    conKarawanlog("Seeding database...");
     await seedDatabase();
   }
 

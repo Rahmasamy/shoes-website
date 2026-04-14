@@ -60,7 +60,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="font-bold">Email Us</h3>
-                  <p className="text-muted-foreground">support@sole.com</p>
+                  <p className="text-muted-foreground">support@Karawancom</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">

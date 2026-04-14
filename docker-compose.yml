@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sole_haven_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: sole_haven
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sole_haven_network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sole_haven_app
+    ports:
+      - "5001:5000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://user:password@postgres:5432/sole_haven
+      PORT: 5000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./dist:/app/dist:ro
+    networks:
+      - sole_haven_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  sole_haven_network:
+    driver: bridge

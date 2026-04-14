@@ -45,7 +45,7 @@ export default function Auth() {
       <div className="flex-1 flex items-center justify-center p-4">
         <Card className="w-full max-w-md shadow-xl border-border/50">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-display font-bold">Welcome to SOLE.</CardTitle>
+            <CardTitle className="text-2xl font-display font-bold">Welcome to Karawan</CardTitle>
             <CardDescription>Join the community of sneaker enthusiasts</CardDescription>
           </CardHeader>
           <CardContent>

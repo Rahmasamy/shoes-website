@@ -48,7 +48,7 @@ export function Navbar() {
           </SheetTrigger>
           <SheetContent side="left" className="w-[300px] sm:w-[400px]">
             <div className="flex flex-col gap-6 mt-8">
-              <Link href="/" onClick={() => setIsOpen(false)} className="text-2xl font-display font-bold text-primary">SOLE.</Link>
+              <Link href="/" onClick={() => setIsOpen(false)} className="text-2xl font-display font-bold text-primary">Karawan</Link>
               <div className="flex flex-col gap-4">
                 <NavLinks />
               </div>
