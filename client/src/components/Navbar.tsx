@@ -7,7 +7,6 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-
 export function Navbar() {
   const { user, logoutMutation } = useAuth();
   const { data: cart } = useCart();
@@ -15,7 +14,7 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   const cartCount = cart?.reduce((sum, item) => sum + item.quantity, 0) || 0;
-
+   const LogoImage = "/assets/logo.jpeg";
   const NavLinks = () => (
     <>
       <Link href="/" className={`text-sm font-medium transition-colors hover:text-accent ${location === "/" ? "text-primary font-bold" : "text-muted-foreground"}`}>
@@ -33,6 +32,11 @@ export function Navbar() {
       <Link href="/contact" className={`text-sm font-medium transition-colors hover:text-accent ${location === "/contact" ? "text-primary font-bold" : "text-muted-foreground"}`}>
         Contact
       </Link>
+      {user?.role === "admin" && (
+        <Link href="/admin" className={`text-sm font-medium transition-colors hover:text-accent ${location === "/admin" ? "text-primary font-bold" : "text-muted-foreground"}`}>
+          Dashboard
+        </Link>
+      )}
     </>
   );
 
@@ -78,8 +82,11 @@ export function Navbar() {
         </Sheet>
 
         {/* Logo */}
-        <Link href="/" className="text-2xl font-display font-black tracking-tighter text-primary">
-          SOLE<span className="text-accent">.</span>
+        <Link href="/" className="w-14 h-14 flex gap-3 items-center font-display font-black tracking-tighter text-primary">
+        <img src={LogoImage} alt="logoimage" className="flex-1" />
+        <p className="font-bold text-capailtize text-2xl ">
+          Karawan
+        </p>
         </Link>
 
         {/* Desktop Links */}
@@ -89,9 +96,7 @@ export function Navbar() {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="hidden sm:flex">
-            <Search className="h-5 w-5" />
-          </Button>
+        
 
           {user && (
             <Link href="/favorites">

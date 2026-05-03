@@ -3,17 +3,18 @@ import { Footer } from "@/components/Footer";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertContactSchema, type InsertContact } from "@shared/schema";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@shared/routes";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Phone, MapPin, MessageCircle } from "lucide-react";
 
 export default function Contact() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   const form = useForm<InsertContact>({
     resolver: zodResolver(insertContactSchema),
@@ -30,6 +31,7 @@ export default function Contact() {
       if (!res.ok) throw new Error("Failed to send message");
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [api.admin.contacts.path] });
       toast({ title: "Message sent!", description: "We'll get back to you soon." });
       form.reset();
     },
@@ -56,11 +58,13 @@ export default function Contact() {
             <div className="space-y-6">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                  <Mail className="w-5 h-5" />
-                </div>
+<MessageCircle className="h-5 w-5" />         
+       </div>
                 <div>
-                  <h3 className="font-bold">Email Us</h3>
-                  <p className="text-muted-foreground">support@Karawancom</p>
+                  <h3 className="font-bold">Whatsapp</h3>
+                  <p className="text-muted-foreground">
+                    01004642036
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -68,9 +72,11 @@ export default function Contact() {
                   <Phone className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold">Call Us</h3>
-                  <p className="text-muted-foreground">+1 (555) 123-4567</p>
-                  <p className="text-sm text-muted-foreground">Mon-Fri, 9am - 6pm EST</p>
+                  <h3 className="font-bold"> Direct Call </h3>
+                  <p className="text-muted-foreground">
+                    01070740831
+                  </p>
+                 
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -79,7 +85,9 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="font-bold">Visit Us</h3>
-                  <p className="text-muted-foreground">123 Sneaker Street<br />New York, NY 10001</p>
+                  <p className="text-muted-foreground">
+                    7أ يوسف نجيب أمام جراج العتبة ميدان العتبة
+                  </p>
                 </div>
               </div>
             </div>

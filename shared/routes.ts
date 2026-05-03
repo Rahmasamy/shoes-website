@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { insertUserSchema, insertCartItemSchema, insertFavoriteSchema, insertContactSchema, users, products, cartItems, favorites, reviews, contacts } from './schema';
+import { insertUserSchema, insertProductSchema, insertCartItemSchema, insertFavoriteSchema, insertContactSchema, insertOrderSchema, insertOrderItemSchema, users, products, cartItems, favorites, reviews, contacts, orders, orderItems } from './schema';
 
 export const errorSchemas = {
   validation: z.object({
@@ -141,6 +141,99 @@ export const api = {
       path: '/api/user',
       responses: {
         200: z.custom<typeof users.$inferSelect>(),
+        401: errorSchemas.internal,
+      },
+    },
+  },
+  orders: {
+    create: {
+      method: 'POST' as const,
+      path: '/api/orders',
+      input: insertOrderSchema.extend({
+        items: z.array(insertOrderItemSchema.omit({ orderId: true }))
+      }),
+      responses: {
+        201: z.custom<typeof orders.$inferSelect>(),
+        401: errorSchemas.internal,
+      },
+    },
+    list: {
+      method: 'GET' as const,
+      path: '/api/orders',
+      responses: {
+        200: z.array(z.any()),
+        401: errorSchemas.internal,
+      },
+    },
+  },
+  admin: {
+    users: {
+      method: 'GET' as const,
+      path: '/api/admin/users',
+      responses: {
+        200: z.array(z.custom<typeof users.$inferSelect>()),
+        401: errorSchemas.internal,
+      },
+    },
+    createUser: {
+      method: 'POST' as const,
+      path: '/api/admin/users',
+      input: insertUserSchema,
+      responses: {
+        201: z.custom<typeof users.$inferSelect>(),
+        400: errorSchemas.validation,
+        401: errorSchemas.internal,
+      },
+    },
+    contacts: {
+      method: 'GET' as const,
+      path: '/api/admin/contacts',
+      responses: {
+        200: z.array(z.custom<typeof contacts.$inferSelect>()),
+        401: errorSchemas.internal,
+      },
+    },
+    orders: {
+      method: 'GET' as const,
+      path: '/api/admin/orders',
+      responses: {
+        200: z.array(z.any()),
+        401: errorSchemas.internal,
+      },
+    },
+    updateOrderStatus: {
+      method: 'PATCH' as const,
+      path: '/api/admin/orders/:id',
+      input: z.object({ status: z.string() }),
+      responses: {
+        200: z.any(),
+        401: errorSchemas.internal,
+      },
+    },
+    createProduct: {
+      method: 'POST' as const,
+      path: '/api/admin/products',
+      input: insertProductSchema,
+      responses: {
+        201: z.custom<typeof products.$inferSelect>(),
+        401: errorSchemas.internal,
+      },
+    },
+    updateProduct: {
+      method: 'PATCH' as const,
+      path: '/api/admin/products/:id',
+      input: insertProductSchema.partial(),
+      responses: {
+        200: z.custom<typeof products.$inferSelect>(),
+        404: errorSchemas.notFound,
+        401: errorSchemas.internal,
+      },
+    },
+    upload: {
+      method: 'POST' as const,
+      path: '/api/admin/upload',
+      responses: {
+        200: z.object({ url: z.string() }),
         401: errorSchemas.internal,
       },
     },

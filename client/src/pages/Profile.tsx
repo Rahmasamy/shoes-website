@@ -26,7 +26,7 @@ export default function Profile() {
       <Navbar />
       
       <main className="flex-1 container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 items-center md:grid-cols-3 gap-8">
           
           {/* Sidebar */}
           <div className="space-y-6">
@@ -41,7 +41,6 @@ export default function Profile() {
                 <h2 className="text-2xl font-bold">{user.fullName}</h2>
                 <p className="text-muted-foreground">@{user.username}</p>
                 <p className="text-sm text-muted-foreground mb-6">{user.email}</p>
-                <Button variant="outline" className="w-full mb-2">Edit Profile</Button>
                 <Button 
                   variant="destructive" 
                   className="w-full"
@@ -54,7 +53,7 @@ export default function Profile() {
           </div>
 
           {/* Main Content */}
-          <div className="md:col-span-2 space-y-8">
+          {/* <div className="md:col-span-2 space-y-8">
             <div className="bg-card rounded-2xl border p-6">
               <h3 className="text-xl font-bold mb-6">Order History</h3>
               <div className="space-y-4">
@@ -84,7 +83,7 @@ export default function Profile() {
                 <Button variant="outline" className="justify-start w-full">Payment Methods</Button>
               </div>
             </div>
-          </div>
+          </div> */}
 
         </div>
       </main>

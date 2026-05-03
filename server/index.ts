@@ -1,6 +1,6 @@
 import "./env";
-conKarawanlog('DATABASE_URL:', process.env.DATABASE_URL);
-conKarawanlog('.env loaded from:', process.cwd());
+console.log('DATABASE_URL:', process.env.DATABASE_URL);
+console.log('.env loaded from:', process.cwd());
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
@@ -33,7 +33,7 @@ export function log(message: string, source = "express") {
     hour12: true,
   });
 
-  conKarawanlog(`${formattedTime} [${source}] ${message}`);
+  console.log(`${formattedTime} [${source}] ${message}`);
 }
 
 app.use((req, res, next) => {
@@ -70,7 +70,7 @@ app.use((req, res, next) => {
     const message = err.message || "Internal Server Error";
 
     res.status(status).json({ message });
-    throw err;
+    console.error(err);
   });
 
   // importantly only setup vite in development and after
@@ -92,7 +92,7 @@ app.use((req, res, next) => {
     {
       port,
       host: "0.0.0.0",
-     
+
     },
     () => {
       log(`serving on port ${port}`);

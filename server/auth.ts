@@ -9,7 +9,7 @@ import { User } from "@shared/schema";
 
 const scryptAsync = promisify(scrypt);
 
-async function hashPassword(password: string) {
+export async function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex");
   const buf = (await scryptAsync(password, salt, 64)) as Buffer;
   return `${buf.toString("hex")}.${salt}`;
@@ -72,8 +72,11 @@ export function setupAuth(app: Express) {
 
       const hashedPassword = await hashPassword(req.body.password);
       const user = await storage.createUser({
-        ...req.body,
+        username: req.body.username,
+        email: req.body.email,
         password: hashedPassword,
+        fullName: req.body.fullName,
+        role: req.body.role || "user",
       });
 
       req.login(user, (err) => {

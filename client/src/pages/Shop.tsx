@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { useProducts } from "@/hooks/use-products";
 import { useFavorites } from "@/hooks/use-favorites";
 import { Navbar } from "@/components/Navbar";
@@ -16,7 +16,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export default function Shop() {
   const [location] = useLocation();
-  const searchParams = new URLSearchParams(window.location.search);
+  const search = useSearch();
+  const searchParams = new URLSearchParams(search);
   const categoryParam = searchParams.get("category") as 'men' | 'women' | 'kids' | undefined;
   
   const [filters, setFilters] = useState({

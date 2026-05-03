@@ -96,9 +96,11 @@ export default function Cart() {
                     <span className="font-bold text-lg text-primary">${total.toFixed(2)}</span>
                   </div>
                 </div>
-                <Button className="w-full h-12 rounded-xl text-lg font-bold">
-                  Checkout <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
+                <Link href="/checkout">
+                  <Button className="w-full h-12 rounded-xl text-lg font-bold">
+                    Checkout <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
                 <p className="text-xs text-center text-muted-foreground mt-4">
                   Secure checkout powered by Stripe
                 </p>

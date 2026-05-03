@@ -16,7 +16,11 @@ export default function Favorites() {
         <h1 className="text-3xl font-display font-bold mb-8">My Wishlist</h1>
 
         {isLoading ? (
-          <div>Loading...</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <div key={i} className="h-[400px] rounded-2xl bg-secondary/50 animate-pulse" />
+            ))}
+          </div>
         ) : favorites && favorites.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {favorites.map((item) => (

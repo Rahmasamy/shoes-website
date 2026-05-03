@@ -33,9 +33,11 @@ RUN npm ci --production
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 
-# Create non-root user for security
+# Create non-root user for security and set permissions
 RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
+    adduser -S nodejs -u 1001 && \
+    mkdir -p /app/uploads && \
+    chown -R nodejs:nodejs /app
 
 USER nodejs
 

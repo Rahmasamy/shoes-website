@@ -101,6 +101,7 @@ function useRegisterMutation() {
     },
     onSuccess: (user: User) => {
       queryClient.setQueryData([api.auth.me.path], user);
+      queryClient.invalidateQueries({ queryKey: [api.admin.users.path] });
       toast({ title: "Welcome!", description: "Account created successfully" });
     },
     onError: (error: Error) => {

@@ -9,6 +9,7 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   fullName: text("full_name"),
   avatarUrl: text("avatar_url"),
+  role: text("role").default("user").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -59,6 +60,29 @@ export const contacts = pgTable("contacts", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const orders = pgTable("orders", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull(),
+  address: text("address").notNull(),
+  city: text("city").notNull(),
+  phone: text("phone").notNull(),
+  totalAmount: decimal("total_amount").notNull(),
+  status: text("status").notNull().default("pending"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const orderItems = pgTable("order_items", {
+  id: serial("id").primaryKey(),
+  orderId: integer("order_id").notNull(),
+  productId: integer("product_id").notNull(),
+  quantity: integer("quantity").notNull(),
+  price: decimal("price").notNull(),
+  size: text("size").notNull(),
+  color: text("color").notNull(),
+});
+
 // Schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
 export const insertProductSchema = createInsertSchema(products).omit({ id: true, createdAt: true });
@@ -66,6 +90,8 @@ export const insertCartItemSchema = createInsertSchema(cartItems).omit({ id: tru
 export const insertFavoriteSchema = createInsertSchema(favorites).omit({ id: true });
 export const insertReviewSchema = createInsertSchema(reviews).omit({ id: true, createdAt: true });
 export const insertContactSchema = createInsertSchema(contacts).omit({ id: true, createdAt: true });
+export const insertOrderSchema = createInsertSchema(orders).omit({ id: true, createdAt: true });
+export const insertOrderItemSchema = createInsertSchema(orderItems).omit({ id: true });
 
 // Types
 export type User = typeof users.$inferSelect;
@@ -74,3 +100,5 @@ export type CartItem = typeof cartItems.$inferSelect;
 export type Favorite = typeof favorites.$inferSelect;
 export type Review = typeof reviews.$inferSelect;
 export type Contact = typeof contacts.$inferSelect;
+export type Order = typeof orders.$inferSelect;
+export type OrderItem = typeof orderItems.$inferSelect;

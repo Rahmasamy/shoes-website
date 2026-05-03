@@ -12,6 +12,8 @@ import Favorites from "@/pages/Favorites";
 import Contact from "@/pages/Contact";
 import Auth from "@/pages/Auth";
 import Profile from "@/pages/Profile";
+import AdminDashboard from "@/pages/AdminDashboard";
+import Checkout from "@/pages/Checkout";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -25,6 +27,8 @@ function Router() {
       <Route path="/contact" component={Contact} />
       <Route path="/auth" component={Auth} />
       <Route path="/profile" component={Profile} />
+      <Route path="/admin" component={AdminDashboard} />
+      <Route path="/checkout" component={Checkout} />
       <Route component={NotFound} />
     </Switch>
   );

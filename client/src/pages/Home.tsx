@@ -10,7 +10,7 @@ import { ArrowRight, Truck, Shield, RefreshCcw, Star } from "lucide-react";
 
 export default function Home() {
   // Fetch products
-  const { data: newArrivals } = useProducts({ sort: "newest" });
+  const { data: newArrivals, isLoading: isLoadingNewArrivals } = useProducts({ sort: "newest" });
   const { data: popular } = useProducts({ sort: "popular" });
   const { data: favorites } = useFavorites();
 
@@ -149,15 +149,23 @@ export default function Home() {
             </Link>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {newArrivals?.slice(0, 4).map((product) => (
-              <ProductCard 
-                key={product.id} 
-                product={product} 
-                isFavorite={isFavorite(product.id)}
-              />
-            ))}
-          </div>
+          {isLoadingNewArrivals ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-[400px] rounded-2xl bg-secondary/50 animate-pulse" />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {newArrivals?.slice(0, 4).map((product) => (
+                <ProductCard 
+                  key={product.id} 
+                  product={product} 
+                  isFavorite={isFavorite(product.id)}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

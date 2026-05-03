@@ -1,15 +1,42 @@
-import type { Express } from "express";
+import express, { type Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth } from "./auth";
+import { setupAuth, hashPassword } from "./auth";
 import { api } from "@shared/routes";
 import { z } from "zod";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
   setupAuth(app);
+
+  // Setup Multer for file uploads
+  const uploadDir = path.resolve(process.cwd(), "uploads");
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+  }
+
+  const multerStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      cb(null, uniqueSuffix + path.extname(file.originalname));
+    },
+  });
+
+  const upload = multer({ storage: multerStorage });
+
+  // Serve uploads directory
+  app.use("/uploads", (req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    next();
+  }, express.static(uploadDir));
 
   // Products
   app.get(api.products.list.path, async (req, res) => {
@@ -73,10 +100,87 @@ export async function registerRoutes(
     res.status(201).json(contact);
   });
 
+  // Admin Routes
+  app.get(api.admin.users.path, async (req, res) => {
+    if (!req.isAuthenticated() || req.user?.role !== "admin") return res.status(401).send();
+    const users = await storage.getUsers();
+    res.json(users);
+  });
+
+  app.get(api.admin.contacts.path, async (req, res) => {
+    if (!req.isAuthenticated() || req.user?.role !== "admin") return res.status(401).send();
+    const contacts = await storage.getContacts();
+    res.json(contacts);
+  });
+
+  app.post(api.admin.createProduct.path, async (req, res) => {
+    if (!req.isAuthenticated() || req.user?.role !== "admin") return res.status(401).send();
+    const product = await storage.createProduct(req.body);
+    res.status(201).json(product);
+  });
+
+  app.patch(api.admin.updateProduct.path, async (req, res) => {
+    if (!req.isAuthenticated() || req.user?.role !== "admin") return res.status(401).send();
+    const product = await storage.updateProduct(Number(req.params.id), req.body);
+    res.json(product);
+  });
+
+  app.post(api.admin.upload.path, upload.single("file"), async (req, res) => {
+    if (!req.isAuthenticated() || req.user?.role !== "admin") return res.status(401).send();
+    if (!req.file) return res.status(400).send("No file uploaded");
+    const url = `/uploads/${req.file.filename}`;
+    res.json({ url });
+  });
+
+  app.get(api.admin.orders.path, async (req, res) => {
+    if (!req.isAuthenticated() || req.user?.role !== "admin") return res.status(401).send();
+    const orders = await storage.getAllOrders();
+    res.json(orders);
+  });
+
+  app.post(api.admin.createUser.path, async (req, res) => {
+    if (!req.isAuthenticated() || req.user?.role !== "admin") return res.status(401).send();
+    
+    const existingUser = await storage.getUserByUsername(req.body.username);
+    if (existingUser) {
+      return res.status(400).json({ message: "Username already exists" });
+    }
+
+    const hashedPassword = await hashPassword(req.body.password);
+    const user = await storage.createUser({
+      ...req.body,
+      password: hashedPassword
+    });
+    res.status(201).json(user);
+  });
+
+  app.patch(api.admin.updateOrderStatus.path, async (req, res) => {
+    if (!req.isAuthenticated() || req.user?.role !== "admin") return res.status(401).send();
+    await storage.updateOrderStatus(Number(req.params.id), req.body.status);
+    res.sendStatus(200);
+  });
+
+  // Orders
+  app.post(api.orders.create.path, async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const { items, ...orderData } = req.body;
+    const order = await storage.createOrder({
+      ...orderData,
+      userId: req.user!.id
+    }, items);
+    res.status(201).json(order);
+  });
+
+  app.get(api.orders.list.path, async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const orders = await storage.getOrders(req.user!.id);
+    res.json(orders);
+  });
+
   // Seed Data
   const existingProducts = await storage.getProducts();
   if (existingProducts.length === 0) {
-    conKarawanlog("Seeding database...");
+    console.log("Seeding database...");
     await seedDatabase();
   }
 
@@ -157,14 +261,14 @@ async function seedDatabase() {
   for (const p of dummyProducts) {
     await storage.createProduct(p);
   }
-  
+
   await storage.createReview({
     name: "John Doe",
     rating: 5,
     content: "Great shoes! Very comfortable.",
     avatarUrl: "https://github.com/shadcn.png"
   });
-  
+
   await storage.createReview({
     name: "Jane Smith",
     rating: 4,

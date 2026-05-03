@@ -12,9 +12,13 @@ export default function Auth() {
   const { loginMutation, registerMutation, user } = useAuth();
   const [location, setLocation] = useLocation();
 
-  // Redirect if already logged in
+  // Redirect based on role if logged in
   if (user) {
-    setLocation("/");
+    if (user.role === "admin") {
+      setLocation("/admin");
+    } else {
+      setLocation("/");
+    }
     return null;
   }
 
@@ -35,6 +39,7 @@ export default function Auth() {
       email: formData.get("email") as string,
       password: formData.get("password") as string,
       fullName: formData.get("fullName") as string,
+      role: formData.get("role") as string || "user",
     });
   };
 
@@ -88,6 +93,19 @@ export default function Auth() {
                   <div className="space-y-2">
                     <Label htmlFor="reg-password">Password</Label>
                     <Input id="reg-password" name="password" type="password" required className="rounded-lg" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Role</Label>
+                    <div className="flex gap-4 p-1 bg-secondary/50 rounded-lg">
+                      <label className="flex-1 flex items-center justify-center gap-2 p-2 rounded-md cursor-pointer has-[:checked]:bg-white has-[:checked]:shadow-sm transition-all">
+                        <input type="radio" name="role" value="user" defaultChecked className="sr-only" />
+                        <span className="text-sm font-medium">User</span>
+                      </label>
+                      <label className="flex-1 flex items-center justify-center gap-2 p-2 rounded-md cursor-pointer has-[:checked]:bg-white has-[:checked]:shadow-sm transition-all">
+                        <input type="radio" name="role" value="admin" className="sr-only" />
+                        <span className="text-sm font-medium">Admin</span>
+                      </label>
+                    </div>
                   </div>
                   <Button type="submit" className="w-full mt-4" disabled={registerMutation.isPending}>
                     {registerMutation.isPending ? "Creating account..." : "Create Account"}
