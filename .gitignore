@@ -1,5 +1,5 @@
 .env
-.en.development
+.env.development
 node_modules
 dist
 .DS_Store

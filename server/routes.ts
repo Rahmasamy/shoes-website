@@ -182,11 +182,8 @@ export async function registerRoutes(
   });
 
   // Seed Data
-  const existingProducts = await storage.getProducts();
-  if (existingProducts.length === 0) {
-    console.log("Seeding database...");
-    await seed();
-  }
+  console.log("Checking and seeding database...");
+  await seed();
 
   return httpServer;
 }
