@@ -39,7 +39,7 @@ export default function Cart() {
                         <h3 className="font-bold text-lg">{item.product.name}</h3>
                         <p className="text-sm text-muted-foreground">{item.size} / {item.color}</p>
                       </div>
-                      <p className="font-bold text-lg">${Number(item.product.price).toFixed(2)}</p>
+                      <p className="font-bold text-lg">{Number(item.product.price).toFixed(2)} EGP</p>
                     </div>
 
                     <div className="flex justify-between items-end">
@@ -85,15 +85,15 @@ export default function Cart() {
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span className="font-medium">${subtotal.toFixed(2)}</span>
+                    <span className="font-medium">{subtotal.toFixed(2)} EGP</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Shipping</span>
-                    <span className="font-medium">{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
+                    <span className="font-medium">{shipping === 0 ? "Free" : `${shipping.toFixed(2)} EGP`}</span>
                   </div>
                   <div className="border-t pt-4 flex justify-between">
                     <span className="font-bold text-lg">Total</span>
-                    <span className="font-bold text-lg text-primary">${total.toFixed(2)}</span>
+                    <span className="font-bold text-lg text-primary">{total.toFixed(2)} EGP</span>
                   </div>
                 </div>
                 <Link href="/checkout">

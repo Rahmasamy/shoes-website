@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { ShoppingBag, Star, Check } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import { cn } from "@/lib/utils";
 
 export default function ProductDetails() {
@@ -32,6 +33,16 @@ export default function ProductDetails() {
     });
   };
 
+  const handleWhatsApp = () => {
+    let messageText = `Hello, I'm interested in the product: ${product.name}`;
+    if (selectedColor) messageText += `, Color: ${selectedColor}`;
+    if (selectedSize) messageText += `, Size: ${selectedSize}`;
+    messageText += ` (Price: ${Number(product.price).toFixed(2)} EGP). Is it available?`;
+    
+    const message = encodeURIComponent(messageText);
+    window.open(`https://wa.me/201004642036?text=${message}`, "_blank");
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -40,11 +51,11 @@ export default function ProductDetails() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
           {/* Images */}
           <div className="space-y-4">
-            <div className="aspect-[4/5] w-full rounded-3xl overflow-hidden bg-secondary">
+            <div className="aspect-[4/5] w-full rounded-3xl overflow-hidden bg-white">
               <img 
                 src={product.images[currentImage]} 
                 alt={product.name} 
-                className="w-full h-full object-cover object-center"
+                className="w-full h-full object-contain object-center"
               />
             </div>
             <div className="grid grid-cols-4 gap-4">
@@ -57,7 +68,7 @@ export default function ProductDetails() {
                   )}
                   onClick={() => setCurrentImage(i)}
                 >
-                  <img src={img} alt="" className="w-full h-full object-cover" />
+                  <img src={img} alt="" className="w-full h-full object-contain" />
                 </button>
               ))}
             </div>
@@ -76,7 +87,7 @@ export default function ProductDetails() {
               </div>
             </div>
 
-            <p className="text-3xl font-bold text-primary">${Number(product.price).toFixed(2)}</p>
+            <p className="text-3xl font-bold text-primary">{Number(product.price).toFixed(2)} EGP</p>
 
             <p className="text-muted-foreground leading-relaxed">
               {product.description}
@@ -121,10 +132,10 @@ export default function ProductDetails() {
               </div>
             </div>
 
-            <div className="pt-8 border-t border-border">
+            <div className="pt-8 border-t border-border flex flex-col sm:flex-row gap-4">
               <Button 
                 size="lg" 
-                className="w-full h-14 text-lg rounded-full"
+                className="flex-1 h-14 text-lg rounded-full"
                 disabled={!selectedSize || !selectedColor || addToCart.isPending}
                 onClick={handleAddToCart}
               >
@@ -134,10 +145,18 @@ export default function ProductDetails() {
                   </>
                 )}
               </Button>
-              {(!selectedSize || !selectedColor) && (
-                <p className="text-center text-sm text-destructive mt-2">Please select a size and color</p>
-              )}
+              <Button
+                variant="outline"
+                size="lg"
+                className="flex-1 h-14 text-lg rounded-full border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700 dark:hover:bg-green-950/20"
+                onClick={handleWhatsApp}
+              >
+                <FaWhatsapp className="mr-2 h-5 w-5" /> WhatsApp Inquiry
+              </Button>
             </div>
+            {(!selectedSize || !selectedColor) && (
+              <p className="text-center text-sm text-destructive mt-2">Please select a size and color to add to cart</p>
+            )}
           </div>
         </div>
       </main>

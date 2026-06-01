@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { type Product } from "@shared/schema";
 import { Heart, ShoppingBag } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToggleFavorite } from "@/hooks/use-favorites";
@@ -33,15 +34,22 @@ export function ProductCard({ product, isFavorite = false }: ProductCardProps) {
     });
   };
 
+  const handleWhatsApp = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const message = encodeURIComponent(`Hello, I'm interested in the product: ${product.name} (Price: ${Number(product.price).toFixed(2)} EGP). Is it available?`);
+    window.open(`https://wa.me/201004642036?text=${message}`, "_blank");
+  };
+
   return (
     <Link href={`/product/${product.id}`} className="group block h-full">
       <div className="relative h-full flex flex-col transition-all duration-300 hover:-translate-y-1">
         {/* Image Container */}
-        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-secondary mb-4">
+        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-white mb-4">
           <img
             src={product.images[0]}
             alt={product.name}
-            className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+            className="h-full w-full object-contain object-center transition-transform duration-500 group-hover:scale-105"
           />
           
           {/* Badges */}
@@ -69,6 +77,13 @@ export function ProductCard({ product, isFavorite = false }: ProductCardProps) {
             >
               <ShoppingBag className="h-5 w-5" />
             </Button>
+            <Button
+              size="icon"
+              className="h-10 w-10 rounded-full shadow-lg bg-green-500 hover:bg-green-600 text-white transition-colors"
+              onClick={handleWhatsApp}
+            >
+              <FaWhatsapp className="h-5 w-5" />
+            </Button>
           </div>
         </div>
 
@@ -79,7 +94,7 @@ export function ProductCard({ product, isFavorite = false }: ProductCardProps) {
           </h3>
           <p className="text-muted-foreground text-sm capitalize">{product.category} • {product.type}</p>
           <div className="mt-2 flex items-center justify-between">
-            <span className="font-bold text-lg">${Number(product.price).toFixed(2)}</span>
+            <span className="font-bold text-lg">{Number(product.price).toFixed(2)} EGP</span>
             <div className="flex gap-1">
                {product.colors.slice(0, 3).map((color, i) => (
                  <div key={i} className="w-3 h-3 rounded-full border border-border" style={{ backgroundColor: color.toLowerCase() }} />

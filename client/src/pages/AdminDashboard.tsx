@@ -26,6 +26,15 @@ export default function AdminDashboard() {
   const [isUploading, setIsUploading] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (editingProduct) {
+      setUploadedImages(editingProduct.images || []);
+    } else {
+      setUploadedImages([]);
+    }
+  }, [editingProduct]);
 
   // Protect route
   useEffect(() => {
@@ -134,11 +143,11 @@ export default function AdminDashboard() {
   if (!user || user.role !== "admin") return null;
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
     const formData = new FormData();
-    formData.append("file", file);
+    files.forEach(file => formData.append("file", file));
 
     setIsUploading(true);
     try {
@@ -147,16 +156,18 @@ export default function AdminDashboard() {
         body: formData,
       });
       if (!res.ok) throw new Error("Upload failed");
-      const { url } = await res.json();
+      const result = await res.json();
       
-      const imageInput = document.getElementById("image") as HTMLInputElement;
-      if (imageInput) imageInput.value = url;
+      // result could be { urls: [] }
+      const newUrls = result.urls || [result.url];
+      setUploadedImages(prev => [...prev, ...newUrls]);
       
-      toast({ title: "Uploaded", description: "Image uploaded successfully" });
+      toast({ title: "Uploaded", description: `${newUrls.length} image(s) uploaded successfully` });
     } catch (err) {
       toast({ title: "Error", description: `Upload failed: ${err instanceof Error ? err.message : 'Unknown error'}`, variant: "destructive" });
     } finally {
       setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = ""; // reset file input
     }
   };
 
@@ -169,9 +180,9 @@ export default function AdminDashboard() {
       price: formData.get("price"),
       category: formData.get("category"),
       type: formData.get("type"),
-      sizes: (formData.get("sizes") as string).split(",").map(s => s.trim()),
-      colors: (formData.get("colors") as string).split(",").map(c => c.trim()),
-      images: [(formData.get("image") as string)],
+      sizes: (formData.get("sizes") as string).split(",").map(s => s.trim()).filter(Boolean),
+      colors: (formData.get("colors") as string).split(",").map(c => c.trim()).filter(Boolean),
+      images: uploadedImages,
       isNew: true,
       isPopular: false
     };
@@ -368,7 +379,7 @@ export default function AdminDashboard() {
                   )}
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={handleProductSubmit} className="space-y-4">
+                  <form key={editingProduct?.id || 'new'} onSubmit={handleProductSubmit} className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">Product Name</Label>
                       <Input id="name" name="name" defaultValue={editingProduct?.name} required />
@@ -379,7 +390,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="price">Price ($)</Label>
+                        <Label htmlFor="price">Price (EGP)</Label>
                         <Input id="price" name="price" type="number" step="0.01" defaultValue={editingProduct?.price} required />
                       </div>
                       <div className="space-y-2">
@@ -400,14 +411,58 @@ export default function AdminDashboard() {
                       <Label htmlFor="type">Type</Label>
                       <Input id="type" name="type" defaultValue={editingProduct?.type} required placeholder="e.g. sneakers, running" />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="image">Image URL</Label>
+                    <div className="space-y-3">
+                      <Label>Product Images</Label>
+                      <div className="flex flex-wrap gap-3 mb-2">
+                        {uploadedImages.map((url, idx) => (
+                          <div key={idx} className="relative group border rounded-lg overflow-hidden w-20 h-20 bg-muted">
+                            <img src={url} className="w-full h-full object-contain" />
+                            <button 
+                              type="button" 
+                              onClick={() => setUploadedImages(prev => prev.filter((_, i) => i !== idx))}
+                              className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 text-white transition-all"
+                            >
+                              <X className="h-5 w-5" />
+                            </button>
+                          </div>
+                        ))}
+                        <button 
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={isUploading}
+                          className="border-2 border-dashed rounded-lg flex flex-col items-center justify-center w-20 h-20 cursor-pointer hover:border-primary hover:bg-accent/20 transition-all text-muted-foreground hover:text-primary"
+                        >
+                          {isUploading ? (
+                            <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
+                          ) : (
+                            <>
+                              <Plus className="h-5 w-5" />
+                              <span className="text-[10px] font-medium mt-1">Add</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" accept="image/*" multiple />
+                      
                       <div className="flex gap-2">
-                        <Input id="image" name="image" defaultValue={editingProduct?.images?.[0]} placeholder="https://..." />
-                        <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" accept="image/*" />
-                        <Button type="button" variant="outline" size="icon" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
-                          <Upload className="h-4 w-4" />
-                        </Button>
+                        <Input id="manual-img" placeholder="Or paste external image URL..." onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            const val = e.currentTarget.value.trim();
+                            if (val) {
+                              setUploadedImages(p => [...p, val]);
+                              e.currentTarget.value = "";
+                            }
+                          }
+                        }}/>
+                        <Button type="button" variant="outline" onClick={() => {
+                          const input = document.getElementById("manual-img") as HTMLInputElement;
+                          const val = input?.value.trim();
+                          if (val) {
+                            setUploadedImages(p => [...p, val]);
+                            input.value = "";
+                          }
+                        }}>Add</Button>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -455,7 +510,7 @@ export default function AdminDashboard() {
                             </div>
                           </TableCell>
                           <TableCell className="capitalize">{p.category} • {p.type}</TableCell>
-                          <TableCell>${p.price}</TableCell>
+                          <TableCell>{p.price} EGP</TableCell>
                           <TableCell className="text-right">
                             <Button variant="ghost" size="icon" onClick={() => setEditingProduct(p)}>
                               <Edit2 className="h-4 w-4" />
@@ -534,13 +589,13 @@ export default function AdminDashboard() {
                               {order.items.map((item: any, idx: number) => (
                                 <div key={idx} className="flex justify-between text-sm">
                                   <span>{item.quantity} x {item.product.name} ({item.size})</span>
-                                  <span className="font-medium">${(Number(item.price) * item.quantity).toFixed(2)}</span>
+                                  <span className="font-medium">{(Number(item.price) * item.quantity).toFixed(2)} EGP</span>
                                 </div>
                               ))}
                               <Separator className="my-2" />
                               <div className="flex justify-between items-center pt-1">
                                 <span className="font-bold text-lg">Total Amount</span>
-                                <span className="text-xl font-bold text-primary">${Number(order.totalAmount).toFixed(2)}</span>
+                                <span className="text-xl font-bold text-primary">{Number(order.totalAmount).toFixed(2)} EGP</span>
                               </div>
                             </div>
                           </div>

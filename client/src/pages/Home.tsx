@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { useProducts } from "@/hooks/use-products";
 import { ProductCard } from "@/components/ProductCard";
 import { useFavorites } from "@/hooks/use-favorites";
-import { ArrowRight, Truck, Shield, RefreshCcw, Star } from "lucide-react";
+import { ArrowRight, Truck, Shield, RefreshCcw, Star, HelpCircle } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export default function Home() {
   // Fetch products
@@ -35,9 +36,7 @@ export default function Home() {
         
         <div className="container mx-auto px-4 relative z-20">
           <div className="max-w-2xl space-y-8 animate-fade-in-up">
-            <span className="inline-block px-4 py-2 rounded-full bg-accent/10 text-accent font-bold tracking-wider text-sm">
-              NEW COLLECTION 2024
-            </span>
+          
             <h1 className="text-6xl md:text-8xl font-display font-black leading-tight text-foreground">
               STEP INTO <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
@@ -93,9 +92,8 @@ export default function Home() {
                     <Truck className="w-8 h-8 text-primary group-hover:text-accent transition-colors" />
                   </div>
                 </div>
-                <h3 className="font-bold text-xl mb-3 group-hover:text-primary transition-colors">Free Shipping</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed flex-grow">On all orders over $150. International shipping available to 150+ countries.</p>
-                <div className="mt-4 text-primary text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity">Learn more →</div>
+                 <h3 className="font-bold text-xl mb-3 group-hover:text-accent transition-colors">Shipping in Egypt</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed flex-grow">Fast shipping all over Egypt.</p>
               </div>
             </div>
 
@@ -200,6 +198,83 @@ export default function Home() {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section className="py-24 bg-background relative overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10 max-w-5xl">
+          <div className="text-center mb-16 animate-fade-in-up">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-6">
+              <HelpCircle className="w-8 h-8 text-primary" />
+            </div>
+            <h2 className="text-4xl md:text-5xl font-display font-black text-foreground mb-4">Frequently Asked Questions</h2>
+            <p className="text-muted-foreground max-w-lg mx-auto">Everything you need to know about shipping, payments, and returns.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+            <Accordion type="single" collapsible className="w-full space-y-4">
+              <AccordionItem value="changes" className="border border-border/50 bg-card rounded-xl px-4 hover:shadow-md transition-all">
+                <AccordionTrigger className="text-left hover:no-underline font-bold py-5">Can I change my order after submitting it?</AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed">
+                  Yes! After placing an order, we perform a confirmation call to review order details with you and efficiently apply any adjustments requested before dispatch.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="sizing" className="border border-border/50 bg-card rounded-xl px-4 hover:shadow-md transition-all">
+                <AccordionTrigger className="text-left hover:no-underline font-bold py-5">How do I choose the right size?</AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed">
+                  A comprehensive size guide is available on every product page to assist you. Furthermore, we confirm sizing selections collectively during our dedicated validation call based on your requirements.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="currency" className="border border-border/50 bg-card rounded-xl px-4 hover:shadow-md transition-all">
+                <AccordionTrigger className="text-left hover:no-underline font-bold py-5">Can I purchase items in another currency?</AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed">
+                  Absolutely. When checking out via supported international cards, the debited total matches the EGP conversion rate provided securely by formal bank processing.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+
+            <Accordion type="single" collapsible className="w-full space-y-4">
+              <AccordionItem value="shipping" className="border border-border/50 bg-card rounded-xl px-4 hover:shadow-md transition-all">
+                <AccordionTrigger className="text-left hover:no-underline font-bold py-5">What are the shipping rates and times?</AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed">
+                  <div className="space-y-2 text-sm">
+                    <p className="font-semibold">Rates across Egypt:</p>
+                    <ul className="list-disc list-inside pl-2 space-y-1">
+                      <li>Cairo: 70 EGP</li>
+                      <li>Alex & Delta: 80 EGP</li>
+                      <li>Upper Egypt / Coast: 110 EGP</li>
+                      <li className="text-primary font-bold">FREE shipping on orders above 1,999 EGP!</li>
+                    </ul>
+                    <p className="pt-2"><span className="font-semibold">Delivery:</span> Standard 2-5 business days following initial call. Global routes span ~7 days.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="payments" className="border border-border/50 bg-card rounded-xl px-4 hover:shadow-md transition-all">
+                <AccordionTrigger className="text-left hover:no-underline font-bold py-5">Which payment methods are available?</AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed">
+                  We proudly provide convenience by accepting <strong className="text-foreground">Cash on Delivery</strong> for simple pay-as-you-receive ease.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="returns" className="border border-border/50 bg-card rounded-xl px-4 hover:shadow-md transition-all">
+                <AccordionTrigger className="text-left hover:no-underline font-bold py-5">How can I request a return or exchange?</AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed">
+                  <div className="space-y-2 text-sm">
+                    <p>Request within 14 days post-arrival via:</p>
+                    <ul className="list-disc list-inside pl-2 space-y-1">
+                      <li>Integrated return portal in your user dashboard.</li>
+                      <li>Connecting via WhatsApp / Direct support: <span className="font-semibold text-foreground">01004424453</span></li>
+                      <li>Forwarding queries to our service mailbox.</li>
+                    </ul>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials */}
       <section className="py-24 bg-secondary/30">
         <div className="container mx-auto px-4">
@@ -218,7 +293,7 @@ export default function Home() {
                   "Absolutely love these shoes! The comfort is unmatched and the style is exactly what I was looking for. Will definitely buy again."
                 </p>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gray-200" />
+                 
                   <div>
                     <h4 className="font-bold">Alex Johnson</h4>
                     <p className="text-sm text-muted-foreground">Verified Buyer</p>

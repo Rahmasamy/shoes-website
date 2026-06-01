@@ -175,10 +175,10 @@ export default function Checkout() {
                       <img src={item.product.images[0]} className="h-12 w-12 rounded-md object-cover" />
                       <div className="flex-1">
                         <p className="font-medium line-clamp-1">{item.product.name}</p>
-                        <p className="text-muted-foreground">{item.quantity} x ${item.product.price}</p>
+                        <p className="text-muted-foreground">{item.quantity} x {item.product.price} EGP</p>
                         <p className="text-[10px] uppercase text-accent font-bold">{item.size} • {item.color}</p>
                       </div>
-                      <p className="font-bold">${(Number(item.product.price) * item.quantity).toFixed(2)}</p>
+                      <p className="font-bold">{(Number(item.product.price) * item.quantity).toFixed(2)} EGP</p>
                     </div>
                   ))}
                 </div>
@@ -188,15 +188,15 @@ export default function Checkout() {
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <span>{subtotal.toFixed(2)} EGP</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Shipping</span>
-                    <span>${shipping.toFixed(2)}</span>
+                    <span>{shipping.toFixed(2)} EGP</span>
                   </div>
                   <div className="flex justify-between font-bold text-lg pt-2">
                     <span>Total</span>
-                    <span className="text-primary">${total.toFixed(2)}</span>
+                    <span className="text-primary">{total.toFixed(2)} EGP</span>
                   </div>
                 </div>
               </CardContent>
@@ -207,7 +207,7 @@ export default function Checkout() {
                   className="w-full h-12 text-lg shadow-lg shadow-primary/20"
                   disabled={createOrderMutation.isPending}
                 >
-                  {createOrderMutation.isPending ? "Processing..." : `Place Order • $${total.toFixed(2)}`}
+                  {createOrderMutation.isPending ? "Processing..." : `Place Order • ${total.toFixed(2)} EGP`}
                 </Button>
               </CardFooter>
             </Card>

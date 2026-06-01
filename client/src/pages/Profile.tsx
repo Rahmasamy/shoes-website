@@ -64,7 +64,7 @@ export default function Profile() {
                       <p className="text-sm text-muted-foreground">{order.date} • {order.items} items</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold">${order.total.toFixed(2)}</p>
+                      <p className="font-bold">{order.total.toFixed(2)} EGP</p>
                       <span className="inline-block px-2 py-1 rounded-md bg-green-100 text-green-700 text-xs font-bold">
                         {order.status}
                       </span>

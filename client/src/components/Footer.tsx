@@ -47,8 +47,16 @@ export function Footer() {
             <h4 className="font-display font-bold text-lg">Support</h4>
             <ul className="space-y-2">
               <li><Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors">Contact Us</Link></li>
-              <li><Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors">Shipping & Returns</Link></li>
-           
+              <li><Link href="/shipping-returns" className="text-muted-foreground hover:text-primary transition-colors">Shipping & Returns</Link></li>
+              <li className="text-muted-foreground pt-2">
+                <span className="font-bold text-foreground text-xs uppercase tracking-wider block mb-1">WhatsApp / Call</span>
+                <a href="https://wa.me/201004642036" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors block">
+                  01004642036
+                </a>
+                <a href="tel:01070740831" className="hover:text-primary transition-colors block">
+                  01070740831
+                </a>
+              </li>
             </ul>
           </div>
 

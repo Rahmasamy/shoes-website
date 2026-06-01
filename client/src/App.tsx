@@ -12,6 +12,7 @@ import Favorites from "@/pages/Favorites";
 import Contact from "@/pages/Contact";
 import Auth from "@/pages/Auth";
 import Profile from "@/pages/Profile";
+import ShippingReturns from "@/pages/ShippingReturns";
 import AdminDashboard from "@/pages/AdminDashboard";
 import Checkout from "@/pages/Checkout";
 import NotFound from "@/pages/not-found";
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/favorites" component={Favorites} />
       <Route path="/contact" component={Contact} />
       <Route path="/auth" component={Auth} />
+      <Route path="/shipping-returns" component={ShippingReturns} />
       <Route path="/profile" component={Profile} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/checkout" component={Checkout} />
