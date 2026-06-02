@@ -1,8 +1,11 @@
 import { db } from "./db";
 import { users, products, cartItems, favorites, reviews, contacts, orders, orderItems, type User, type InsertUser, type Product, type CartItem, type Favorite, type Review, type Contact, type InsertContact, type Order, type OrderItem } from "@shared/schema";
 import { eq, and, desc, sql, ilike } from "drizzle-orm";
+import session from "express-session";
+import createMemoryStore from "memorystore";
 
 export interface IStorage {
+  sessionStore: any;
   // User
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
@@ -10,7 +13,7 @@ export interface IStorage {
   getUsers(): Promise<User[]>;
 
   // Products
-  getProducts(filters?: { category?: string; type?: string; sort?: string; search?: string }): Promise<Product[]>;
+  getProducts(filters?: { category?: string; type?: string; sort?: string; search?: string; page?: number; limit?: number }): Promise<{ products: Product[]; total: number }>;
   getProduct(id: number): Promise<Product | undefined>;
   createProduct(product: any): Promise<Product>;
   updateProduct(id: number, product: any): Promise<Product>;
@@ -41,6 +44,15 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  sessionStore: any;
+
+  constructor() {
+    const MemoryStore = createMemoryStore(session);
+    this.sessionStore = new MemoryStore({
+      checkPeriod: 86400000 // prune expired entries every 24h
+    });
+  }
+
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
@@ -60,8 +72,9 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(users).orderBy(desc(users.createdAt));
   }
 
-  async getProducts(filters?: { category?: string; type?: string; sort?: string; search?: string }): Promise<Product[]> {
+  async getProducts(filters?: { category?: string; type?: string; sort?: string; search?: string; page?: number; limit?: number }): Promise<{ products: Product[]; total: number }> {
     let query = db.select().from(products);
+    let countQuery = db.select({ count: sql<number>`count(*)` }).from(products);
     
     const conditions = [];
     if (filters?.category) {
@@ -80,10 +93,21 @@ export class DatabaseStorage implements IStorage {
     if (filters?.sort === 'popular') orderBy = desc(products.isPopular);
 
     if (conditions.length > 0) {
-      return await query.where(and(...conditions)).orderBy(orderBy);
+      query = query.where(and(...conditions)) as any;
+      countQuery = countQuery.where(and(...conditions)) as any;
     }
     
-    return await query.orderBy(orderBy);
+    const [countResult] = await countQuery;
+    const total = Number(countResult?.count || 0);
+
+    let finalQuery = query.orderBy(orderBy);
+    if (filters?.page && filters?.limit) {
+      const offset = (filters.page - 1) * filters.limit;
+      finalQuery = finalQuery.limit(filters.limit).offset(offset) as any;
+    }
+
+    const productsResult = await finalQuery;
+    return { products: productsResult, total };
   }
 
   async getProduct(id: number): Promise<Product | undefined> {

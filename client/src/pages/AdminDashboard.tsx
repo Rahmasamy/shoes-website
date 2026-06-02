@@ -44,24 +44,26 @@ export default function AdminDashboard() {
   }, [user, setLocation]);
 
   // Auto-refresh queries every 2 seconds to keep dashboard live across tabs
-  const { data: products } = useQuery({ 
+  const { data: productsData } = useQuery<{ products: any[]; total: number }>({ 
     queryKey: [api.products.list.path],
     refetchInterval: 2000,
     refetchIntervalInBackground: true
   });
-  const { data: usersList } = useQuery({ 
+  const products = productsData?.products;
+
+  const { data: usersList } = useQuery<any[]>({ 
     queryKey: [api.admin.users.path],
     enabled: !!user && user.role === "admin",
     refetchInterval: 2000,
     refetchIntervalInBackground: true
   });
-  const { data: contacts } = useQuery({ 
+  const { data: contacts } = useQuery<any[]>({ 
     queryKey: [api.admin.contacts.path],
     enabled: !!user && user.role === "admin",
     refetchInterval: 2000,
     refetchIntervalInBackground: true
   });
-  const { data: ordersList } = useQuery({
+  const { data: ordersList } = useQuery<any[]>({
     queryKey: [api.admin.orders.path],
     enabled: !!user && user.role === "admin",
     refetchInterval: 2000,

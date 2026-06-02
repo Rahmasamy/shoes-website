@@ -24,9 +24,14 @@ export const api = {
         type: z.string().optional(),
         sort: z.enum(['price_asc', 'price_desc', 'newest', 'popular']).optional(),
         search: z.string().optional(),
+        page: z.coerce.number().optional(),
+        limit: z.coerce.number().optional(),
       }).optional(),
       responses: {
-        200: z.array(z.custom<typeof products.$inferSelect>()),
+        200: z.object({
+          products: z.array(z.custom<typeof products.$inferSelect>()),
+          total: z.number(),
+        }),
       },
     },
     get: {

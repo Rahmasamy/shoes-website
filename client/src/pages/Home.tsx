@@ -11,9 +11,12 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 export default function Home() {
   // Fetch products
-  const { data: newArrivals, isLoading: isLoadingNewArrivals } = useProducts({ sort: "newest" });
-  const { data: popular } = useProducts({ sort: "popular" });
+  const { data: newArrivalsData, isLoading: isLoadingNewArrivals } = useProducts({ sort: "newest" });
+  const { data: popularData } = useProducts({ sort: "popular" });
   const { data: favorites } = useFavorites();
+
+  const newArrivals = newArrivalsData?.products;
+  const popular = popularData?.products;
 
   const isFavorite = (id: number) => favorites?.some(f => f.productId === id);
 

@@ -58,8 +58,9 @@ export async function registerRoutes(
 
   // Products
   app.get(api.products.list.path, async (req, res) => {
-    const products = await storage.getProducts(req.query as any);
-    res.json(products);
+    const parsed = api.products.list.input ? api.products.list.input.parse(req.query) : req.query;
+    const result = await storage.getProducts(parsed);
+    res.json(result);
   });
 
   app.get(api.products.get.path, async (req, res) => {

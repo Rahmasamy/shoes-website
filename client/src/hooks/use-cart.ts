@@ -21,7 +21,7 @@ export function useAddToCart() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (data: z.infer<typeof insertCartItemSchema>) => {
+    mutationFn: async (data: z.infer<NonNullable<typeof api.cart.add.input>>) => {
       const res = await fetch(api.cart.add.path, {
         method: api.cart.add.method,
         headers: { "Content-Type": "application/json" },

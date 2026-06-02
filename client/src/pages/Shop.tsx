@@ -20,6 +20,9 @@ export default function Shop() {
   const searchParams = new URLSearchParams(search);
   const categoryParam = searchParams.get("category") as 'men' | 'women' | 'kids' | undefined;
   
+  const [page, setPage] = useState(1);
+  const LIMIT = 9;
+
   const [filters, setFilters] = useState({
     category: categoryParam,
     type: "",
@@ -27,12 +30,28 @@ export default function Shop() {
     sort: "newest" as "newest" | "price_asc" | "price_desc" | "popular",
   });
 
+  const updateFilters = (updater: (prev: typeof filters) => typeof filters) => {
+    setFilters(updater);
+    setPage(1);
+  };
+
   // Sync category from URL
   useEffect(() => {
-    if (categoryParam) setFilters(f => ({ ...f, category: categoryParam }));
+    if (categoryParam) {
+      setFilters(f => ({ ...f, category: categoryParam }));
+      setPage(1);
+    }
   }, [categoryParam]);
 
-  const { data: products, isLoading } = useProducts(filters);
+  const { data: response, isLoading } = useProducts({
+    ...filters,
+    page,
+    limit: LIMIT,
+  });
+  const products = response?.products;
+  const total = response?.total || 0;
+  const totalPages = Math.ceil(total / LIMIT);
+
   const { data: favorites } = useFavorites();
   const isFavorite = (id: number) => favorites?.some(f => f.productId === id);
 
@@ -43,6 +62,12 @@ export default function Shop() {
       search: "",
       sort: "newest",
     });
+    setPage(1);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const SidebarContent = () => (
@@ -64,7 +89,7 @@ export default function Shop() {
                   <Checkbox 
                     id={`cat-${cat}`} 
                     checked={filters.category === cat}
-                    onCheckedChange={(checked) => setFilters(f => ({ ...f, category: checked ? cat as any : undefined }))}
+                    onCheckedChange={(checked) => updateFilters(f => ({ ...f, category: checked ? cat as any : undefined }))}
                   />
                   <Label htmlFor={`cat-${cat}`} className="capitalize cursor-pointer">{cat}</Label>
                 </div>
@@ -82,7 +107,7 @@ export default function Shop() {
                   <Checkbox 
                     id={`type-${type}`}
                     checked={filters.type === type}
-                    onCheckedChange={(checked) => setFilters(f => ({ ...f, type: checked ? type : "" }))}
+                    onCheckedChange={(checked) => updateFilters(f => ({ ...f, type: checked ? type : "" }))}
                   />
                   <Label htmlFor={`type-${type}`} className="capitalize cursor-pointer">{type}</Label>
                 </div>
@@ -105,7 +130,7 @@ export default function Shop() {
             <h1 className="text-3xl font-display font-bold capitalize">
               {filters.category ? `${filters.category}'s Collection` : 'All Products'}
             </h1>
-            <p className="text-muted-foreground">{products?.length || 0} products found</p>
+            <p className="text-muted-foreground">{total} products found</p>
           </div>
 
           <div className="flex items-center gap-4 w-full md:w-auto">
@@ -116,7 +141,7 @@ export default function Shop() {
                 placeholder="Search products..." 
                 className="pl-9 rounded-full"
                 value={filters.search}
-                onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
+                onChange={(e) => updateFilters(f => ({ ...f, search: e.target.value }))}
               />
             </div>
 
@@ -138,7 +163,7 @@ export default function Shop() {
             <select 
               className="bg-background border border-input rounded-md px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               value={filters.sort}
-              onChange={(e) => setFilters(f => ({ ...f, sort: e.target.value as any }))}
+              onChange={(e) => updateFilters(f => ({ ...f, sort: e.target.value as any }))}
             >
               <option value="newest">Newest</option>
               <option value="popular">Most Popular</option>
@@ -171,15 +196,49 @@ export default function Shop() {
                 <Button onClick={clearFilters}>Clear Filters</Button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {products?.map((product) => (
-                  <ProductCard 
-                    key={product.id} 
-                    product={product} 
-                    isFavorite={isFavorite(product.id)}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {products?.map((product) => (
+                    <ProductCard 
+                      key={product.id} 
+                      product={product} 
+                      isFavorite={isFavorite(product.id)}
+                    />
+                  ))}
+                </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="mt-12 flex justify-center items-center gap-2 flex-wrap">
+                    <Button
+                      variant="outline"
+                      onClick={() => handlePageChange(page - 1)}
+                      disabled={page === 1}
+                    >
+                      Previous
+                    </Button>
+                    
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                      <Button
+                        key={p}
+                        variant={page === p ? "default" : "outline"}
+                        onClick={() => handlePageChange(p)}
+                        className="w-10 h-10 p-0"
+                      >
+                        {p}
+                      </Button>
+                    ))}
+
+                    <Button
+                      variant="outline"
+                      onClick={() => handlePageChange(page + 1)}
+                      disabled={page === totalPages}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

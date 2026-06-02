@@ -12,7 +12,9 @@ export function useProducts(filters?: ProductFilters) {
       const url = new URL(window.location.origin + api.products.list.path);
       if (filters) {
         Object.entries(filters).forEach(([key, value]) => {
-          if (value) url.searchParams.append(key, String(value));
+          if (value !== undefined && value !== null && value !== "") {
+            url.searchParams.append(key, String(value));
+          }
         });
       }
       const res = await fetch(url.toString());
