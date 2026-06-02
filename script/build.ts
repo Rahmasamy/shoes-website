@@ -62,6 +62,6 @@ async function buildAll() {
 }
 
 buildAll().catch((err) => {
-  conKarawanerror(err);
+  console.error(err);
   process.exit(1);
 });
