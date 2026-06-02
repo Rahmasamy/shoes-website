@@ -21,7 +21,7 @@ export default function Shop() {
   const categoryParam = searchParams.get("category") as 'men' | 'women' | 'kids' | undefined;
   
   const [page, setPage] = useState(1);
-  const LIMIT = 9;
+  const LIMIT = 6;
 
   const [filters, setFilters] = useState({
     category: categoryParam,

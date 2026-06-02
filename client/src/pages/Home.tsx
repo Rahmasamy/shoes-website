@@ -25,6 +25,8 @@ export default function Home() {
   const heroImage = "/assets/hero.png";
   // Features: Clean minimal shoe
   const featureImage = "/assets/sale1.jpg";
+  const karemanReview = "/assets/kareman-review.jpeg";
+  const kholoudReview = "/assets/kholoud-review.jpeg";
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -283,27 +285,24 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-display font-bold mb-4">What Our Customers Say</h2>
-            <p className="text-muted-foreground">Don't just take our word for it.</p>
+            <p className="text-muted-foreground">Real reviews from our beautiful community.</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-card p-8 rounded-2xl shadow-sm border border-border/50">
-                <div className="flex gap-1 mb-4 text-accent">
-                  {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-current" />)}
-                </div>
-                <p className="text-foreground/80 mb-6 italic">
-                  "Absolutely love these shoes! The comfort is unmatched and the style is exactly what I was looking for. Will definitely buy again."
-                </p>
-                <div className="flex items-center gap-4">
-                 
-                  <div>
-                    <h4 className="font-bold">Alex Johnson</h4>
-                    <p className="text-sm text-muted-foreground">Verified Buyer</p>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="bg-card p-4 rounded-3xl shadow-lg border border-border/50 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col items-center">
+              <img 
+                src={karemanReview} 
+                alt="Kareman's Review" 
+                className="w-full h-auto rounded-2xl object-contain max-h-[500px]" 
+              />
+            </div>
+            <div className="bg-card p-4 rounded-3xl shadow-lg border border-border/50 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col items-center">
+              <img 
+                src={kholoudReview} 
+                alt="Kholoud's Review" 
+                className="w-full h-auto rounded-2xl object-contain max-h-[500px]" 
+              />
+            </div>
           </div>
         </div>
       </section>
