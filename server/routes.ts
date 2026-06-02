@@ -21,6 +21,23 @@ export async function registerRoutes(
     fs.mkdirSync(uploadDir);
   }
 
+  // Restore seed images from backup if they don't exist in uploads folder (handles persistent disk mount)
+  const backupDir = path.resolve(process.cwd(), "uploads_backup");
+  if (fs.existsSync(backupDir)) {
+    try {
+      const files = fs.readdirSync(backupDir);
+      for (const file of files) {
+        const destPath = path.join(uploadDir, file);
+        if (!fs.existsSync(destPath)) {
+          fs.copyFileSync(path.join(backupDir, file), destPath);
+        }
+      }
+      console.log("Restored missing seed images from backup.");
+    } catch (err) {
+      console.error("Failed to restore seed images from backup:", err);
+    }
+  }
+
   const multerStorage = multer.diskStorage({
     destination: (req, file, cb) => {
       cb(null, uploadDir);
