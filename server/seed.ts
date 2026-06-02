@@ -8,7 +8,7 @@ export const seedProducts = [
   {
     name: "shoes",
     description: "shoes",
-    price: "300.00",
+    price: "445.00",
     category: "men",
     type: "shoe",
     sizes: ["44", "43", "45"],
@@ -20,7 +20,7 @@ export const seedProducts = [
   {
     name: "Comfortable Woman shoe",
     description: "Chic & Comfortable Woman shoe with Black color",
-    price: "95.00",
+    price: "475.00",
     category: "women",
     type: "shoe",
     sizes: ["37", "38", "39", "40", "41"],
@@ -32,7 +32,7 @@ export const seedProducts = [
   {
     name: "Shoe women's ",
     description: "Shoe women's with Black color",
-    price: "150.00",
+    price: "575.00",
     category: "women",
     type: "Shoe",
     sizes: ["37", "38", "39", "40", "41"],
@@ -44,7 +44,7 @@ export const seedProducts = [
   {
     name: "Slipper High-quality ",
     description: "High Quality Slipper with Blue color.",
-    price: "120.00",
+    price: "475.00",
     category: "men",
     type: "Slipper",
     sizes: ["42", "43", "44", "45"],
@@ -56,7 +56,7 @@ export const seedProducts = [
   {
     name: "Slipper  Women's High-quality ",
     description: "Chic Slipper  Women's High-quality ",
-    price: "60.00",
+    price: "625.00",
     category: "women",
     type: "casual",
     sizes: ["36", "37", "38", "39", "40"],
@@ -68,7 +68,7 @@ export const seedProducts = [
   {
     name: "Slipper High-quality ",
     description: "High Quality Slipper with Black color.",
-    price: "250.00",
+    price: "450.00",
     category: "women",
     type: "Slipper",
     sizes: ["37", "38", "39", "40", "41"],
@@ -80,7 +80,7 @@ export const seedProducts = [
   {
     name: "Medical Women shoes",
     description: "High Quality Medical Women shoes with All Colors.",
-    price: "180.00",
+    price: "475.00",
     category: "women",
     type: "Shoes",
     sizes: ["37", "38", "39", "40", "41"],
@@ -92,7 +92,7 @@ export const seedProducts = [
   {
     name: "Slipper High-quality Women's ",
     description: "Slipper High-quality Women's with black color",
-    price: "225.00",
+    price: "600.00",
     category: "women",
     type: "Slipper",
     sizes: ["37", "38", "39", "40", "41"],
@@ -129,7 +129,8 @@ export async function seed() {
       await db.insert(products).values(p);
       console.log(`Seeded product: ${p.name}`);
     } else {
-      console.log(`Product already exists: ${p.name}`);
+      await db.update(products).set({ price: p.price }).where(eq(products.id, existing[0].id));
+      console.log(`Updated product price: ${p.name} to ${p.price}`);
     }
   }
 
