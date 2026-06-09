@@ -245,10 +245,9 @@ export default function Home() {
                   <div className="space-y-2 text-sm">
                     <p className="font-semibold">Rates across Egypt:</p>
                     <ul className="list-disc list-inside pl-2 space-y-1">
-                      <li>Cairo: 70 EGP</li>
-                      <li>Alex & Delta: 80 EGP</li>
-                      <li>Upper Egypt / Coast: 110 EGP</li>
-                      <li className="text-primary font-bold">FREE shipping on orders above 1,999 EGP!</li>
+                      <li>Cairo: 50 EGP</li>
+                    
+                    
                     </ul>
                     <p className="pt-2"><span className="font-semibold">Delivery:</span> Standard 2-5 business days following initial call. Global routes span ~7 days.</p>
                   </div>

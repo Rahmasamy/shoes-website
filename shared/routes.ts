@@ -154,8 +154,8 @@ export const api = {
     create: {
       method: 'POST' as const,
       path: '/api/orders',
-      input: insertOrderSchema.extend({
-        items: z.array(insertOrderItemSchema.omit({ orderId: true }))
+      input: insertOrderSchema.omit({ totalAmount: true }).extend({
+        items: z.array(insertOrderItemSchema.omit({ orderId: true, price: true }))
       }),
       responses: {
         201: z.custom<typeof orders.$inferSelect>(),
@@ -184,6 +184,16 @@ export const api = {
       method: 'POST' as const,
       path: '/api/admin/users',
       input: insertUserSchema,
+      responses: {
+        201: z.custom<typeof users.$inferSelect>(),
+        400: errorSchemas.validation,
+        401: errorSchemas.internal,
+      },
+    },
+    createAdmin: {
+      method: 'POST' as const,
+      path: '/api/admin/create-admin',
+      input: insertUserSchema.omit({ role: true }),
       responses: {
         201: z.custom<typeof users.$inferSelect>(),
         400: errorSchemas.validation,

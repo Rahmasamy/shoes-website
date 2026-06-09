@@ -23,18 +23,16 @@ export default function Checkout() {
   const [isSuccess, setIsSuccess] = useState(false);
 
   const subtotal = cart?.reduce((sum, item) => sum + Number(item.product.price) * item.quantity, 0) || 0;
-  const shipping = 15;
+  const shipping = 50;
   const total = subtotal + shipping;
 
   const createOrderMutation = useMutation({
     mutationFn: async (formData: any) => {
       const orderData = {
         ...formData,
-        totalAmount: total.toString(),
         items: cart?.map(item => ({
           productId: item.productId,
           quantity: item.quantity,
-          price: item.product.price,
           size: item.size,
           color: item.color
         }))

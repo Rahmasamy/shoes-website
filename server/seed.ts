@@ -1,7 +1,7 @@
 import "./env";
 import { db } from "./db";
 import { products, reviews, users } from "@shared/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { hashPassword } from "./auth";
 
 export const seedProducts = [
@@ -162,6 +162,23 @@ export async function seed() {
     console.log("Seeded default admin user: admin / admin123");
   } else {
     console.log("Admin user already exists");
+  }
+
+  // Enable Row Level Security (RLS) on all public tables to resolve Supabase security warning
+  console.log("Enabling Row Level Security (RLS) on all public tables...");
+  const tables = [
+    "users",
+    "products",
+    "cart_items",
+    "favorites",
+    "reviews",
+    "contacts",
+    "orders",
+    "order_items",
+  ];
+  for (const table of tables) {
+    await db.execute(sql.raw(`ALTER TABLE "${table}" ENABLE ROW LEVEL SECURITY;`));
+    console.log(`Enabled RLS on table: ${table}`);
   }
 }
 

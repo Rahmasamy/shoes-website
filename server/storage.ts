@@ -219,9 +219,36 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createOrder(order: any, items: any[]): Promise<Order> {
-    const [newOrder] = await db.insert(orders).values(order).returning();
-    
+    let subtotal = 0;
+    const processedItems = [];
+
     for (const item of items) {
+      const [product] = await db.select().from(products).where(eq(products.id, item.productId));
+      if (!product) {
+        throw new Error(`Product with ID ${item.productId} not found`);
+      }
+      
+      const itemPrice = Number(product.price);
+      subtotal += itemPrice * item.quantity;
+      
+      processedItems.push({
+        productId: item.productId,
+        quantity: item.quantity,
+        price: product.price, // Backend-verified price
+        size: item.size,
+        color: item.color
+      });
+    }
+
+    const shippingCost = 50; // 50 EGP Shipping
+    const totalAmount = (subtotal + shippingCost).toFixed(2);
+
+    const [newOrder] = await db.insert(orders).values({
+      ...order,
+      totalAmount
+    }).returning();
+    
+    for (const item of processedItems) {
       await db.insert(orderItems).values({
         ...item,
         orderId: newOrder.id

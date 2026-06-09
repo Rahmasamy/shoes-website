@@ -77,7 +77,7 @@ export function setupAuth(app: Express) {
         email: req.body.email,
         password: hashedPassword,
         fullName: req.body.fullName,
-        role: req.body.role || "user",
+        role: "user",
       });
 
       req.login(user, (err) => {

@@ -87,10 +87,10 @@ export default function Cart() {
                     <span className="text-muted-foreground">Subtotal</span>
                     <span className="font-medium">{subtotal.toFixed(2)} EGP</span>
                   </div>
-                  <div className="flex justify-between">
+                  {/* <div className="flex justify-between">
                     <span className="text-muted-foreground">Shipping</span>
                     <span className="font-medium">{shipping === 0 ? "Free" : `${shipping.toFixed(2)} EGP`}</span>
-                  </div>
+                  </div> */}
                   <div className="border-t pt-4 flex justify-between">
                     <span className="font-bold text-lg">Total</span>
                     <span className="font-bold text-lg text-primary">{total.toFixed(2)} EGP</span>

@@ -1,4 +1,4 @@
-import express, { type Express } from "express";
+import express, { type Express, type Request, type Response, type NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, hashPassword } from "./auth";
@@ -14,6 +14,21 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
   setupAuth(app);
+
+  // Authentication middlewares
+  const requireAuth = (req: Request, res: Response, next: NextFunction) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized: Authentication required" });
+    }
+    next();
+  };
+
+  const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
+    if (!req.isAuthenticated() || req.user?.role !== "admin") {
+      return res.status(401).json({ message: "Unauthorized: Admin access required" });
+    }
+    next();
+  };
 
   // Setup Multer for file uploads
   const uploadDir = path.resolve(process.cwd(), "uploads");
@@ -70,39 +85,33 @@ export async function registerRoutes(
   });
 
   // Cart
-  app.get(api.cart.list.path, async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send();
+  app.get(api.cart.list.path, requireAuth, async (req, res) => {
     const items = await storage.getCartItems(req.user!.id);
     res.json(items);
   });
 
-  app.post(api.cart.add.path, async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send();
+  app.post(api.cart.add.path, requireAuth, async (req, res) => {
     const item = await storage.addToCart(req.user!.id, req.body);
     res.status(201).json(item);
   });
 
-  app.patch(api.cart.update.path, async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send();
+  app.patch(api.cart.update.path, requireAuth, async (req, res) => {
     const item = await storage.updateCartItem(Number(req.params.id), req.body.quantity);
     res.json(item);
   });
 
-  app.delete(api.cart.delete.path, async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send();
+  app.delete(api.cart.delete.path, requireAuth, async (req, res) => {
     await storage.removeFromCart(Number(req.params.id));
     res.status(204).send();
   });
 
   // Favorites
-  app.get(api.favorites.list.path, async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send();
+  app.get(api.favorites.list.path, requireAuth, async (req, res) => {
     const items = await storage.getFavorites(req.user!.id);
     res.json(items);
   });
 
-  app.post(api.favorites.toggle.path, async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send();
+  app.post(api.favorites.toggle.path, requireAuth, async (req, res) => {
     const result = await storage.toggleFavorite(req.user!.id, req.body.productId);
     res.json(result);
   });
@@ -120,33 +129,27 @@ export async function registerRoutes(
   });
 
   // Admin Routes
-  app.get(api.admin.users.path, async (req, res) => {
-    if (!req.isAuthenticated() || req.user?.role !== "admin") return res.status(401).send();
+  app.get(api.admin.users.path, requireAdmin, async (req, res) => {
     const users = await storage.getUsers();
     res.json(users);
   });
 
-  app.get(api.admin.contacts.path, async (req, res) => {
-    if (!req.isAuthenticated() || req.user?.role !== "admin") return res.status(401).send();
+  app.get(api.admin.contacts.path, requireAdmin, async (req, res) => {
     const contacts = await storage.getContacts();
     res.json(contacts);
   });
 
-  app.post(api.admin.createProduct.path, async (req, res) => {
-    if (!req.isAuthenticated() || req.user?.role !== "admin") return res.status(401).send();
+  app.post(api.admin.createProduct.path, requireAdmin, async (req, res) => {
     const product = await storage.createProduct(req.body);
     res.status(201).json(product);
   });
 
-  app.patch(api.admin.updateProduct.path, async (req, res) => {
-    if (!req.isAuthenticated() || req.user?.role !== "admin") return res.status(401).send();
+  app.patch(api.admin.updateProduct.path, requireAdmin, async (req, res) => {
     const product = await storage.updateProduct(Number(req.params.id), req.body);
     res.json(product);
   });
 
-  app.post(api.admin.upload.path, upload.array("file"), async (req, res) => {
-    if (!req.isAuthenticated() || req.user?.role !== "admin") return res.status(401).send();
-    
+  app.post(api.admin.upload.path, requireAdmin, upload.array("file"), async (req, res) => {
     const files = req.files as Express.Multer.File[];
     if (!files || files.length === 0) return res.status(400).send("No files uploaded");
     
@@ -154,15 +157,12 @@ export async function registerRoutes(
     res.json({ urls, url: urls[0] }); // maintain back-compat with single .url
   });
 
-  app.get(api.admin.orders.path, async (req, res) => {
-    if (!req.isAuthenticated() || req.user?.role !== "admin") return res.status(401).send();
+  app.get(api.admin.orders.path, requireAdmin, async (req, res) => {
     const orders = await storage.getAllOrders();
     res.json(orders);
   });
 
-  app.post(api.admin.createUser.path, async (req, res) => {
-    if (!req.isAuthenticated() || req.user?.role !== "admin") return res.status(401).send();
-    
+  app.post(api.admin.createUser.path, requireAdmin, async (req, res) => {
     const existingUser = await storage.getUserByUsername(req.body.username);
     if (existingUser) {
       return res.status(400).json({ message: "Username already exists" });
@@ -176,16 +176,30 @@ export async function registerRoutes(
     res.status(201).json(user);
   });
 
-  app.patch(api.admin.updateOrderStatus.path, async (req, res) => {
-    if (!req.isAuthenticated() || req.user?.role !== "admin") return res.status(401).send();
+  app.post(api.admin.createAdmin.path, requireAdmin, async (req, res) => {
+    const existingUser = await storage.getUserByUsername(req.body.username);
+    if (existingUser) {
+      return res.status(400).json({ message: "Username already exists" });
+    }
+
+    const hashedPassword = await hashPassword(req.body.password);
+    const user = await storage.createUser({
+      ...req.body,
+      password: hashedPassword,
+      role: "admin"
+    });
+    res.status(201).json(user);
+  });
+
+  app.patch(api.admin.updateOrderStatus.path, requireAdmin, async (req, res) => {
     await storage.updateOrderStatus(Number(req.params.id), req.body.status);
     res.sendStatus(200);
   });
 
   // Orders
-  app.post(api.orders.create.path, async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send();
-    const { items, ...orderData } = req.body;
+  app.post(api.orders.create.path, requireAuth, async (req, res) => {
+    const parsed = api.orders.create.input.parse(req.body);
+    const { items, ...orderData } = parsed;
     const order = await storage.createOrder({
       ...orderData,
       userId: req.user!.id
@@ -193,8 +207,7 @@ export async function registerRoutes(
     res.status(201).json(order);
   });
 
-  app.get(api.orders.list.path, async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send();
+  app.get(api.orders.list.path, requireAuth, async (req, res) => {
     const orders = await storage.getOrders(req.user!.id);
     res.json(orders);
   });
