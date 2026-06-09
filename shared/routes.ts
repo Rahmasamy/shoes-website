@@ -252,6 +252,16 @@ export const api = {
         401: errorSchemas.internal,
       },
     },
+    createAdminDirect: {
+      method: 'POST' as const,
+      path: '/api/admin/create-admin-direct',
+      input: insertUserSchema.omit({ role: true }),
+      responses: {
+        201: z.custom<typeof users.$inferSelect>(),
+        400: errorSchemas.validation,
+        401: errorSchemas.internal,
+      },
+    },
   }
 };
 

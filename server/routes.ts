@@ -191,6 +191,26 @@ export async function registerRoutes(
     res.status(201).json(user);
   });
 
+  app.post(api.admin.createAdminDirect.path, async (req, res) => {
+    const adminKey = req.headers["x-admin-key"];
+    if (!adminKey || adminKey !== process.env.ADMIN_CREATION_KEY) {
+      return res.status(401).json({ message: "Unauthorized: Invalid administrative key" });
+    }
+
+    const existingUser = await storage.getUserByUsername(req.body.username);
+    if (existingUser) {
+      return res.status(400).json({ message: "Username already exists" });
+    }
+
+    const hashedPassword = await hashPassword(req.body.password);
+    const user = await storage.createUser({
+      ...req.body,
+      password: hashedPassword,
+      role: "admin"
+    });
+    res.status(201).json(user);
+  });
+
   app.patch(api.admin.updateOrderStatus.path, requireAdmin, async (req, res) => {
     await storage.updateOrderStatus(Number(req.params.id), req.body.status);
     res.sendStatus(200);
