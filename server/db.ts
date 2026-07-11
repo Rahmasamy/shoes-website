@@ -19,4 +19,9 @@ export const pool = new Pool({
   ssl: (isProduction || isExternalDb) ? { rejectUnauthorized: false } : false
 });
 
+// Prevent unhandled pool errors from crashing the process (important on serverless platforms)
+pool.on("error", (err) => {
+  console.error("Unexpected database pool error:", err);
+});
+
 export const db = drizzle(pool, { schema });
