@@ -8,10 +8,6 @@
     {
       "source": "/uploads/:path*",
       "destination": "/api/uploads/:path*"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/dist/public/$1"
     }
   ]
 }
