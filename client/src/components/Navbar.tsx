@@ -14,7 +14,7 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   const cartCount = cart?.reduce((sum, item) => sum + item.quantity, 0) || 0;
-   const LogoImage = "/assets/logo.jpeg";
+   const LogoImage = "/assets/logo.png";
   const NavLinks = () => (
     <>
       <Link href="/" className={`text-sm font-medium transition-colors hover:text-accent ${location === "/" ? "text-primary font-bold" : "text-muted-foreground"}`}>

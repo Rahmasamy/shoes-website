@@ -22,7 +22,7 @@ export default function Home() {
 
   // Unsplash images for sections
   // Hero: Dynamic shoe action shot - from assets
-  const heroImage = "/assets/hero.png";
+  const heroImage = "/assets/cover.jpeg";
   // Features: Clean minimal shoe
   const featureImage = "/assets/sale1.jpg";
   const karemanReview = "/assets/kareman-review.jpeg";
@@ -33,15 +33,14 @@ export default function Home() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative h-[90vh] w-full overflow-hidden bg-primary/5 flex items-center">
+      <section className="relative h-[85vh] min-h-[600px] w-full overflow-hidden flex items-center">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/50 to-transparent z-10" />
-          <img src={heroImage} alt="Hero" className="w-full h-full object-cover object-center" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/40 to-transparent z-10" />
+          <img src={heroImage} alt="Hero" className="w-full h-full object-cover object-[center_35%]" />
         </div>
-        
+
         <div className="container mx-auto px-4 relative z-20">
           <div className="max-w-2xl space-y-8 animate-fade-in-up">
-          
             <h1 className="text-6xl md:text-8xl font-display font-black leading-tight text-foreground">
               STEP INTO <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
@@ -49,7 +48,7 @@ export default function Home() {
               </span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-lg">
-              Experience the perfect blend of performance and style. 
+              Experience the perfect blend of performance and style.
               Engineered for comfort, designed for the streets.
             </p>
             <div className="flex gap-4">
@@ -73,7 +72,7 @@ export default function Home() {
         {/* Background decoration */}
         <div className="absolute top-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
         <div className="absolute bottom-0 right-0 w-72 h-72 bg-accent/5 rounded-full blur-3xl translate-x-1/3 translate-y-1/3"></div>
-        
+
         <div className="container mx-auto px-4 relative z-10">
           {/* Section Header */}
           <div className="text-center mb-16 space-y-4">
@@ -97,7 +96,7 @@ export default function Home() {
                     <Truck className="w-8 h-8 text-primary group-hover:text-accent transition-colors" />
                   </div>
                 </div>
-                 <h3 className="font-bold text-xl mb-3 group-hover:text-accent transition-colors">Shipping in Egypt</h3>
+                <h3 className="font-bold text-xl mb-3 group-hover:text-accent transition-colors">Shipping in Egypt</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed flex-grow">Fast shipping all over Egypt.</p>
               </div>
             </div>
@@ -151,7 +150,7 @@ export default function Home() {
               </Button>
             </Link>
           </div>
-          
+
           {isLoadingNewArrivals ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {[1, 2, 3, 4].map((i) => (
@@ -161,9 +160,9 @@ export default function Home() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {newArrivals?.slice(0, 4).map((product) => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product} 
+                <ProductCard
+                  key={product.id}
+                  product={product}
                   isFavorite={isFavorite(product.id)}
                 />
               ))}
@@ -184,7 +183,7 @@ export default function Home() {
                 SUMMER COLLECTION
               </h2>
               <p className="text-primary-foreground/80 text-lg max-w-md">
-                Get ready for the season with our latest summer styles. 
+                Get ready for the season with our latest summer styles.
                 Limited time offer on selected items.
               </p>
               <Button size="lg" className="rounded-full bg-white text-primary hover:bg-gray-100 font-bold px-8">
@@ -193,10 +192,10 @@ export default function Home() {
             </div>
             <div className="relative">
               <div className="absolute inset-0 bg-accent/20 rounded-full blur-3xl transform scale-75"></div>
-              <img 
-                src={featureImage} 
-                alt="Promo Shoe" 
-                className="relative h-[500px] object-cover z-10 w-full rounded-3xl shadow-2xl transform rotate-[-12deg] hover:rotate-0 transition-transform duration-500" 
+              <img
+                src={featureImage}
+                alt="Promo Shoe"
+                className="relative h-[500px] object-cover z-10 w-full rounded-3xl shadow-2xl transform rotate-[-12deg] hover:rotate-0 transition-transform duration-500"
               />
             </div>
           </div>
@@ -246,8 +245,8 @@ export default function Home() {
                     <p className="font-semibold">Rates across Egypt:</p>
                     <ul className="list-disc list-inside pl-2 space-y-1">
                       <li>Cairo: 50 EGP</li>
-                    
-                    
+
+
                     </ul>
                     <p className="pt-2"><span className="font-semibold">Delivery:</span> Standard 2-5 business days following initial call. Global routes span ~7 days.</p>
                   </div>
@@ -286,20 +285,20 @@ export default function Home() {
             <h2 className="text-4xl font-display font-bold mb-4">What Our Customers Say</h2>
             <p className="text-muted-foreground">Real reviews from our beautiful community.</p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <div className="bg-card p-4 rounded-3xl shadow-lg border border-border/50 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col items-center">
-              <img 
-                src={karemanReview} 
-                alt="Kareman's Review" 
-                className="w-full h-auto rounded-2xl object-contain max-h-[500px]" 
+              <img
+                src={karemanReview}
+                alt="Kareman's Review"
+                className="w-full h-auto rounded-2xl object-contain max-h-[500px]"
               />
             </div>
             <div className="bg-card p-4 rounded-3xl shadow-lg border border-border/50 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col items-center">
-              <img 
-                src={kholoudReview} 
-                alt="Kholoud's Review" 
-                className="w-full h-auto rounded-2xl object-contain max-h-[500px]" 
+              <img
+                src={kholoudReview}
+                alt="Kholoud's Review"
+                className="w-full h-auto rounded-2xl object-contain max-h-[500px]"
               />
             </div>
           </div>

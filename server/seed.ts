@@ -149,19 +149,32 @@ export async function seed() {
   }
 
   console.log("Seeding default admin...");
+  const adminUsername = process.env.ADMIN_USERNAME || "admin";
+  const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+  const adminEmail = process.env.ADMIN_EMAIL || "admin@karawan.com";
+  const adminFullName = process.env.ADMIN_FULL_NAME || "System Admin";
+  const hashedPassword = await hashPassword(adminPassword);
+
   const adminUsers = await db.select().from(users).where(eq(users.role, "admin"));
   if (adminUsers.length === 0) {
-    const hashedPassword = await hashPassword("admin123");
     await db.insert(users).values({
-      username: "admin",
-      email: "admin@karawan.com",
+      username: adminUsername,
+      email: adminEmail,
       password: hashedPassword,
-      fullName: "System Admin",
+      fullName: adminFullName,
       role: "admin",
     });
-    console.log("Seeded default admin user: admin / admin123");
+    console.log(`Seeded default admin user: ${adminUsername}`);
   } else {
-    console.log("Admin user already exists");
+    await db.update(users)
+      .set({
+        username: adminUsername,
+        email: adminEmail,
+        password: hashedPassword,
+        fullName: adminFullName,
+      })
+      .where(eq(users.id, adminUsers[0].id));
+    console.log(`Updated existing admin user credentials to: ${adminUsername}`);
   }
 
   // Enable Row Level Security (RLS) on all public tables to resolve Supabase security warning
