@@ -11,5 +11,12 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const isProduction = process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
+const isExternalDb = process.env.DATABASE_URL.includes("supabase.co") || process.env.DATABASE_URL.includes("neon.tech");
+
+export const pool = new Pool({ 
+  connectionString: process.env.DATABASE_URL,
+  ssl: (isProduction || isExternalDb) ? { rejectUnauthorized: false } : false
+});
+
 export const db = drizzle(pool, { schema });

@@ -232,9 +232,8 @@ export async function registerRoutes(
     res.json(orders);
   });
 
-  // Seed Data
-  console.log("Checking and seeding database...");
-  await seed();
-
+  // Seed Data is handled via npm scripts (e.g. npm run db:push or npx tsx server/seed.ts)
+  // Removing from startup to prevent serverless function timeouts on Vercel.
+  
   return httpServer;
 }
