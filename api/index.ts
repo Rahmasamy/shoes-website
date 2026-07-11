@@ -16,9 +16,12 @@ const initPromise = registerRoutes(httpServer, app).then(() => {
   console.error("Vercel Serverless API initialization failed:", err);
 });
 
-export default async function handler(req: any, res: any) {
+// Middleware to ensure routes are registered before handling any request
+app.use(async (req, res, next) => {
   if (!isInitialized) {
     await initPromise;
   }
-  return app(req, res);
-}
+  next();
+});
+
+export default app;
