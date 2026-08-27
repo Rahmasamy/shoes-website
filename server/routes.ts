@@ -232,8 +232,17 @@ export async function registerRoutes(
     res.json(orders);
   });
 
-  // Seed Data is handled via npm scripts (e.g. npm run db:push or npx tsx server/seed.ts)
-  // Removing from startup to prevent serverless function timeouts on Vercel.
-  
+  // Manual seed endpoint
+  app.get("/api/seed", async (_req, res) => {
+    try {
+      const { seed } = await import("./seed");
+      await seed();
+      res.json({ success: true, message: "Database tables created and products seeded successfully!" });
+    } catch (err: any) {
+      console.error("Manual seed endpoint error:", err);
+      res.status(500).json({ success: false, error: err.message || String(err) });
+    }
+  });
+
   return httpServer;
 }

@@ -11,12 +11,17 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-const isProduction = process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
-const isExternalDb = process.env.DATABASE_URL.includes("supabase.co") || process.env.DATABASE_URL.includes("neon.tech");
+const dbUrl = process.env.DATABASE_URL || "";
+const isExternalDb =
+  dbUrl.includes("supabase.co") ||
+  dbUrl.includes("neon.tech") ||
+  dbUrl.includes("render.com") ||
+  dbUrl.includes("sslmode=require") ||
+  process.env.PGSSLMODE === "require";
 
 export const pool = new Pool({ 
   connectionString: process.env.DATABASE_URL,
-  ssl: (isProduction || isExternalDb) ? { rejectUnauthorized: false } : false
+  ssl: isExternalDb ? { rejectUnauthorized: false } : false
 });
 
 // Prevent unhandled pool errors from crashing the process (important on serverless platforms)
