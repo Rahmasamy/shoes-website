@@ -139,9 +139,9 @@ export async function createTables() {
       "price" NUMERIC NOT NULL,
       "category" TEXT NOT NULL,
       "type" TEXT NOT NULL,
-      "sizes" JSON NOT NULL,
-      "colors" JSON NOT NULL,
-      "images" JSON NOT NULL,
+      "sizes" JSONB NOT NULL,
+      "colors" JSONB NOT NULL,
+      "images" JSONB NOT NULL,
       "is_new" BOOLEAN DEFAULT FALSE,
       "is_popular" BOOLEAN DEFAULT FALSE,
       "created_at" TIMESTAMP DEFAULT NOW()
@@ -203,18 +203,24 @@ export async function createTables() {
 }
 
 export async function seed() {
+  const logs: string[] = [];
+  const errors: string[] = [];
+
   try {
     await createTables();
-  } catch (err) {
+    logs.push("Tables created or verified.");
+  } catch (err: any) {
     console.error("Error creating tables:", err);
+    errors.push(`createTables error: ${err.message || String(err)}`);
   }
 
-  // Check if products count is 0 and drop/re-create if empty table had mismatched schema
+  // Force recreate if product table exists but product count is 0
   try {
     const countRes = await db.select({ count: sql<number>`count(*)` }).from(products);
     const totalCount = Number(countRes[0]?.count || 0);
     if (totalCount === 0) {
-      console.log("Products table is empty. Recreating tables with matched JSON types...");
+      console.log("Products table is empty. Recreating tables with matched JSONB types...");
+      logs.push("Dropping empty tables and recreating schema...");
       await db.execute(sql.raw(`
         DROP TABLE IF EXISTS "products" CASCADE;
         DROP TABLE IF EXISTS "users" CASCADE;
@@ -227,8 +233,9 @@ export async function seed() {
       `));
       await createTables();
     }
-  } catch (e) {
+  } catch (e: any) {
     console.error("Notice during table count check:", e);
+    errors.push(`Table check notice: ${e.message || String(e)}`);
     await createTables();
   }
 
@@ -242,12 +249,15 @@ export async function seed() {
       if (existing.length === 0) {
         await db.insert(products).values(p);
         console.log(`Seeded product: ${p.name}`);
+        logs.push(`Seeded product: ${p.name}`);
       } else {
         await db.update(products).set({ price: p.price }).where(eq(products.id, existing[0].id));
         console.log(`Updated product price: ${p.name} to ${p.price}`);
+        logs.push(`Updated product: ${p.name}`);
       }
-    } catch (prodErr) {
+    } catch (prodErr: any) {
       console.error(`Failed inserting product ${p.name}:`, prodErr);
+      errors.push(`Failed product ${p.name}: ${prodErr.message || String(prodErr)}`);
     }
   }
 
@@ -261,41 +271,48 @@ export async function seed() {
       if (existing.length === 0) {
         await db.insert(reviews).values(r);
         console.log(`Seeded review from: ${r.name}`);
-      } else {
-        console.log(`Review from ${r.name} already exists`);
+        logs.push(`Seeded review from: ${r.name}`);
       }
-    } catch (revErr) {
+    } catch (revErr: any) {
       console.error(`Failed inserting review ${r.name}:`, revErr);
+      errors.push(`Failed review ${r.name}: ${revErr.message || String(revErr)}`);
     }
   }
 
   console.log("Seeding default admin...");
-  const adminUsername = process.env.ADMIN_USERNAME || "admin";
-  const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
-  const adminEmail = process.env.ADMIN_EMAIL || "admin@karawan.com";
-  const adminFullName = process.env.ADMIN_FULL_NAME || "System Admin";
-  const hashedPassword = await hashPassword(adminPassword);
+  try {
+    const adminUsername = process.env.ADMIN_USERNAME || "admin";
+    const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+    const adminEmail = process.env.ADMIN_EMAIL || "admin@karawan.com";
+    const adminFullName = process.env.ADMIN_FULL_NAME || "System Admin";
+    const hashedPassword = await hashPassword(adminPassword);
 
-  const adminUsers = await db.select().from(users).where(eq(users.role, "admin"));
-  if (adminUsers.length === 0) {
-    await db.insert(users).values({
-      username: adminUsername,
-      email: adminEmail,
-      password: hashedPassword,
-      fullName: adminFullName,
-      role: "admin",
-    });
-    console.log(`Seeded default admin user: ${adminUsername}`);
-  } else {
-    await db.update(users)
-      .set({
+    const adminUsers = await db.select().from(users).where(eq(users.role, "admin"));
+    if (adminUsers.length === 0) {
+      await db.insert(users).values({
         username: adminUsername,
         email: adminEmail,
         password: hashedPassword,
         fullName: adminFullName,
-      })
-      .where(eq(users.id, adminUsers[0].id));
-    console.log(`Updated existing admin user credentials to: ${adminUsername}`);
+        role: "admin",
+      });
+      console.log(`Seeded default admin user: ${adminUsername}`);
+      logs.push(`Seeded admin: ${adminUsername}`);
+    } else {
+      await db.update(users)
+        .set({
+          username: adminUsername,
+          email: adminEmail,
+          password: hashedPassword,
+          fullName: adminFullName,
+        })
+        .where(eq(users.id, adminUsers[0].id));
+      console.log(`Updated existing admin user credentials to: ${adminUsername}`);
+      logs.push(`Updated admin: ${adminUsername}`);
+    }
+  } catch (adminErr: any) {
+    console.error("Failed seeding admin:", adminErr);
+    errors.push(`Failed admin: ${adminErr.message || String(adminErr)}`);
   }
 
   // Enable Row Level Security (RLS) on all public tables to resolve Supabase security warning
@@ -318,6 +335,13 @@ export async function seed() {
       console.log(`RLS notice for ${table}:`, (e as any)?.message || e);
     }
   }
+
+  return {
+    success: errors.length === 0,
+    totalProductsInDatabase: finalCount,
+    logs,
+    errors
+  };
 }
 
 // If run directly via tsx

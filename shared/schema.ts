@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, json, timestamp, decimal } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, json, jsonb, timestamp, decimal } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -20,9 +20,9 @@ export const products = pgTable("products", {
   price: decimal("price").notNull(),
   category: text("category").notNull(), // men, women, kids
   type: text("type").notNull(), // sneakers, boots, running, casual
-  sizes: json("sizes").$type<string[]>().notNull(),
-  colors: json("colors").$type<string[]>().notNull(),
-  images: json("images").$type<string[]>().notNull(),
+  sizes: jsonb("sizes").$type<string[]>().notNull(),
+  colors: jsonb("colors").$type<string[]>().notNull(),
+  images: jsonb("images").$type<string[]>().notNull(),
   isNew: boolean("is_new").default(false),
   isPopular: boolean("is_popular").default(false),
   createdAt: timestamp("created_at").defaultNow(),
