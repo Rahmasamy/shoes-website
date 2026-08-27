@@ -1,15 +1,19 @@
 import "./env";
+import dns from "dns";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
 import * as schema from "@shared/schema";
 
+// Enable IPv6 resolution first so Node.js can resolve Railway internal mesh domains (*.railway.internal)
+try {
+  dns.setDefaultResultOrder("ipv6first");
+} catch (e) {
+  // Fallback for older Node versions
+}
+
 const { Pool } = pg;
 
-let dbUrl = process.env.DATABASE_URL || "";
-if ((!dbUrl || dbUrl.includes("postgres.railway.internal")) && process.env.DATABASE_PUBLIC_URL) {
-  console.log("Using DATABASE_PUBLIC_URL fallback for Railway deployment...");
-  dbUrl = process.env.DATABASE_PUBLIC_URL;
-}
+let dbUrl = process.env.DATABASE_URL || process.env.DATABASE_PUBLIC_URL || "";
 
 if (!dbUrl) {
   throw new Error(
