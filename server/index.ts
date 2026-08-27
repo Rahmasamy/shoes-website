@@ -1,6 +1,5 @@
 import "./env";
-console.log('DATABASE_URL:', process.env.DATABASE_URL);
-console.log('.env loaded from:', process.cwd());
+
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
@@ -63,6 +62,13 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  try {
+    const { seed } = await import("./seed");
+    await seed();
+  } catch (err) {
+    console.error("Auto-seeding error during startup:", err);
+  }
+
   await registerRoutes(httpServer, app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

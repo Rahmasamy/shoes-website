@@ -118,7 +118,96 @@ export const seedReviews = [
   }
 ];
 
+export async function createTables() {
+  console.log("Ensuring database tables exist...");
+  const queries = [
+    `CREATE TABLE IF NOT EXISTS "users" (
+      "id" SERIAL PRIMARY KEY,
+      "username" TEXT NOT NULL UNIQUE,
+      "email" TEXT NOT NULL UNIQUE,
+      "password" TEXT NOT NULL,
+      "full_name" TEXT,
+      "avatar_url" TEXT,
+      "role" TEXT NOT NULL DEFAULT 'user',
+      "created_at" TIMESTAMP DEFAULT NOW()
+    );`,
+    `CREATE TABLE IF NOT EXISTS "products" (
+      "id" SERIAL PRIMARY KEY,
+      "name" TEXT NOT NULL,
+      "description" TEXT NOT NULL,
+      "price" NUMERIC NOT NULL,
+      "category" TEXT NOT NULL,
+      "type" TEXT NOT NULL,
+      "sizes" JSONB NOT NULL,
+      "colors" JSONB NOT NULL,
+      "images" JSONB NOT NULL,
+      "is_new" BOOLEAN DEFAULT FALSE,
+      "is_popular" BOOLEAN DEFAULT FALSE,
+      "created_at" TIMESTAMP DEFAULT NOW()
+    );`,
+    `CREATE TABLE IF NOT EXISTS "cart_items" (
+      "id" SERIAL PRIMARY KEY,
+      "user_id" INTEGER NOT NULL,
+      "product_id" INTEGER NOT NULL,
+      "quantity" INTEGER NOT NULL DEFAULT 1,
+      "size" TEXT NOT NULL,
+      "color" TEXT NOT NULL
+    );`,
+    `CREATE TABLE IF NOT EXISTS "favorites" (
+      "id" SERIAL PRIMARY KEY,
+      "user_id" INTEGER NOT NULL,
+      "product_id" INTEGER NOT NULL
+    );`,
+    `CREATE TABLE IF NOT EXISTS "reviews" (
+      "id" SERIAL PRIMARY KEY,
+      "name" TEXT NOT NULL,
+      "rating" INTEGER NOT NULL,
+      "content" TEXT NOT NULL,
+      "avatar_url" TEXT,
+      "created_at" TIMESTAMP DEFAULT NOW()
+    );`,
+    `CREATE TABLE IF NOT EXISTS "contacts" (
+      "id" SERIAL PRIMARY KEY,
+      "name" TEXT NOT NULL,
+      "email" TEXT NOT NULL,
+      "message" TEXT NOT NULL,
+      "created_at" TIMESTAMP DEFAULT NOW()
+    );`,
+    `CREATE TABLE IF NOT EXISTS "orders" (
+      "id" SERIAL PRIMARY KEY,
+      "user_id" INTEGER NOT NULL,
+      "full_name" TEXT NOT NULL,
+      "email" TEXT NOT NULL,
+      "address" TEXT NOT NULL,
+      "city" TEXT NOT NULL,
+      "phone" TEXT NOT NULL,
+      "total_amount" NUMERIC NOT NULL,
+      "status" TEXT NOT NULL DEFAULT 'pending',
+      "created_at" TIMESTAMP DEFAULT NOW()
+    );`,
+    `CREATE TABLE IF NOT EXISTS "order_items" (
+      "id" SERIAL PRIMARY KEY,
+      "order_id" INTEGER NOT NULL,
+      "product_id" INTEGER NOT NULL,
+      "quantity" INTEGER NOT NULL,
+      "price" NUMERIC NOT NULL,
+      "size" TEXT NOT NULL,
+      "color" TEXT NOT NULL
+    );`
+  ];
+
+  for (const q of queries) {
+    await db.execute(sql.raw(q));
+  }
+}
+
 export async function seed() {
+  try {
+    await createTables();
+  } catch (err) {
+    console.error("Error creating tables:", err);
+  }
+
   console.log("Seeding products...");
   for (const p of seedProducts) {
     const existing = await db
@@ -190,8 +279,12 @@ export async function seed() {
     "order_items",
   ];
   for (const table of tables) {
-    await db.execute(sql.raw(`ALTER TABLE "${table}" ENABLE ROW LEVEL SECURITY;`));
-    console.log(`Enabled RLS on table: ${table}`);
+    try {
+      await db.execute(sql.raw(`ALTER TABLE "${table}" ENABLE ROW LEVEL SECURITY;`));
+      console.log(`Enabled RLS on table: ${table}`);
+    } catch (e) {
+      console.log(`RLS notice for ${table}:`, (e as any)?.message || e);
+    }
   }
 }
 
