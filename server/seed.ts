@@ -118,6 +118,7 @@ export const seedReviews = [
   }
 ];
 
+
 export async function createTables() {
   console.log("Ensuring database tables exist...");
   const queries = [
