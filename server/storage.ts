@@ -1,6 +1,6 @@
 import { db } from "./db";
 import { users, products, cartItems, favorites, reviews, contacts, orders, orderItems, type User, type InsertUser, type Product, type CartItem, type Favorite, type Review, type Contact, type InsertContact, type Order, type OrderItem } from "@shared/schema";
-import { eq, and, desc, sql, ilike } from "drizzle-orm";
+import { eq, and, desc, sql, ilike, getTableColumns } from "drizzle-orm";
 import session from "express-session";
 import createMemoryStore from "memorystore";
 
@@ -146,8 +146,8 @@ export class DatabaseStorage implements IStorage {
 
   async getCartItems(userId: number): Promise<(CartItem & { product: Product })[]> {
     const items = await db.select({
-      cartItem: cartItems,
-      product: products
+      cartItem: getTableColumns(cartItems),
+      product: getTableColumns(products)
     })
     .from(cartItems)
     .innerJoin(products, eq(cartItems.productId, products.id))
@@ -192,8 +192,8 @@ export class DatabaseStorage implements IStorage {
 
   async getFavorites(userId: number): Promise<(Favorite & { product: Product })[]> {
     const items = await db.select({
-      favorite: favorites,
-      product: products
+      favorite: getTableColumns(favorites),
+      product: getTableColumns(products)
     })
     .from(favorites)
     .innerJoin(products, eq(favorites.productId, products.id))
@@ -283,8 +283,8 @@ export class DatabaseStorage implements IStorage {
     
     for (const order of userOrders) {
       const items = await db.select({
-        item: orderItems,
-        product: products
+        item: getTableColumns(orderItems),
+        product: getTableColumns(products)
       })
       .from(orderItems)
       .innerJoin(products, eq(orderItems.productId, products.id))
@@ -304,8 +304,8 @@ export class DatabaseStorage implements IStorage {
     
     for (const order of allOrders) {
       const items = await db.select({
-        item: orderItems,
-        product: products
+        item: getTableColumns(orderItems),
+        product: getTableColumns(products)
       })
       .from(orderItems)
       .innerJoin(products, eq(orderItems.productId, products.id))
