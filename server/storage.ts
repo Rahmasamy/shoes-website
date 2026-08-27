@@ -73,41 +73,59 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getProducts(filters?: { category?: string; type?: string; sort?: string; search?: string; page?: number; limit?: number }): Promise<{ products: Product[]; total: number }> {
-    let query = db.select().from(products);
-    let countQuery = db.select({ count: sql<number>`count(*)` }).from(products);
-    
-    const conditions = [];
-    if (filters?.category) {
-      conditions.push(eq(products.category, filters.category));
-    }
-    if (filters?.type) {
-      conditions.push(eq(products.type, filters.type));
-    }
-    if (filters?.search) {
-      conditions.push(ilike(products.name, `%${filters.search}%`));
-    }
-    
-    let orderBy = desc(products.createdAt);
-    if (filters?.sort === 'price_asc') orderBy = sql`${products.price} ASC`;
-    if (filters?.sort === 'price_desc') orderBy = sql`${products.price} DESC`;
-    if (filters?.sort === 'popular') orderBy = desc(products.isPopular);
+    try {
+      let query = db.select().from(products);
+      let countQuery = db.select({ count: sql<number>`count(*)` }).from(products);
+      
+      const conditions = [];
+      if (filters?.category) {
+        conditions.push(eq(products.category, filters.category));
+      }
+      if (filters?.type) {
+        conditions.push(eq(products.type, filters.type));
+      }
+      if (filters?.search) {
+        conditions.push(ilike(products.name, `%${filters.search}%`));
+      }
+      
+      let orderBy = desc(products.createdAt);
+      if (filters?.sort === 'price_asc') orderBy = sql`${products.price} ASC`;
+      if (filters?.sort === 'price_desc') orderBy = sql`${products.price} DESC`;
+      if (filters?.sort === 'popular') orderBy = desc(products.isPopular);
 
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions)) as any;
-      countQuery = countQuery.where(and(...conditions)) as any;
-    }
-    
-    const [countResult] = await countQuery;
-    const total = Number(countResult?.count || 0);
+      if (conditions.length > 0) {
+        query = query.where(and(...conditions)) as any;
+        countQuery = countQuery.where(and(...conditions)) as any;
+      }
+      
+      const [countResult] = await countQuery;
+      const total = Number(countResult?.count || 0);
 
-    let finalQuery = query.orderBy(orderBy);
-    if (filters?.page && filters?.limit) {
-      const offset = (filters.page - 1) * filters.limit;
-      finalQuery = finalQuery.limit(filters.limit).offset(offset) as any;
-    }
+      let finalQuery = query.orderBy(orderBy);
+      if (filters?.page && filters?.limit) {
+        const offset = (filters.page - 1) * filters.limit;
+        finalQuery = finalQuery.limit(filters.limit).offset(offset) as any;
+      }
 
-    const productsResult = await finalQuery;
-    return { products: productsResult, total };
+      const productsResult = await finalQuery;
+      return { products: productsResult, total };
+    } catch (err: any) {
+      console.error("Error in getProducts:", err);
+      if (err.message?.includes("does not exist") || err.code === "42P01") {
+        try {
+          console.log("Database table missing in getProducts, triggering auto-seed...");
+          const { seed } = await import("./seed");
+          await seed();
+          // Retry query after seeding tables
+          const retryQuery = db.select().from(products);
+          const productsResult = await retryQuery;
+          return { products: productsResult, total: productsResult.length };
+        } catch (seedErr) {
+          console.error("Auto-seed recovery failed:", seedErr);
+        }
+      }
+      return { products: [], total: 0 };
+    }
   }
 
   async getProduct(id: number): Promise<Product | undefined> {

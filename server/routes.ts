@@ -65,6 +65,16 @@ export async function registerRoutes(
 
   const upload = multer({ storage: multerStorage });
 
+  const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<any>) => 
+    (req: Request, res: Response, next: NextFunction) => {
+      Promise.resolve(fn(req, res, next)).catch(next);
+    };
+
+  // Health check endpoint
+  app.get("/api/health", (_req, res) => {
+    res.status(200).json({ status: "ok" });
+  });
+
   // Serve uploads directory
   app.use("/uploads", (req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -72,17 +82,17 @@ export async function registerRoutes(
   }, express.static(uploadDir));
 
   // Products
-  app.get(api.products.list.path, async (req, res) => {
+  app.get(api.products.list.path, asyncHandler(async (req, res) => {
     const parsed = api.products.list.input ? api.products.list.input.parse(req.query) : req.query;
     const result = await storage.getProducts(parsed);
     res.json(result);
-  });
+  }));
 
-  app.get(api.products.get.path, async (req, res) => {
+  app.get(api.products.get.path, asyncHandler(async (req, res) => {
     const product = await storage.getProduct(Number(req.params.id));
     if (!product) return res.status(404).json({ message: "Product not found" });
     res.json(product);
-  });
+  }));
 
   // Cart
   app.get(api.cart.list.path, requireAuth, async (req, res) => {
