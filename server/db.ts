@@ -5,13 +5,18 @@ import * as schema from "@shared/schema";
 
 const { Pool } = pg;
 
-if (!process.env.DATABASE_URL) {
+let dbUrl = process.env.DATABASE_URL || "";
+if ((!dbUrl || dbUrl.includes("postgres.railway.internal")) && process.env.DATABASE_PUBLIC_URL) {
+  console.log("Using DATABASE_PUBLIC_URL fallback for Railway deployment...");
+  dbUrl = process.env.DATABASE_PUBLIC_URL;
+}
+
+if (!dbUrl) {
   throw new Error(
     "DATABASE_URL must be set. Did you forget to provision a database?",
   );
 }
 
-const dbUrl = process.env.DATABASE_URL || "";
 const isExternalDb =
   dbUrl.includes("supabase.co") ||
   dbUrl.includes("neon.tech") ||
@@ -20,7 +25,7 @@ const isExternalDb =
   process.env.PGSSLMODE === "require";
 
 export const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL,
+  connectionString: dbUrl,
   ssl: isExternalDb ? { rejectUnauthorized: false } : false
 });
 
