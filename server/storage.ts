@@ -1,6 +1,6 @@
 import { db } from "./db";
 import { users, products, cartItems, favorites, reviews, contacts, orders, orderItems, type User, type InsertUser, type Product, type CartItem, type Favorite, type Review, type Contact, type InsertContact, type Order, type OrderItem } from "@shared/schema";
-import { eq, and, desc, sql, ilike, getTableColumns } from "drizzle-orm";
+import { eq, and, desc, asc, sql, ilike, getTableColumns } from "drizzle-orm";
 import session from "express-session";
 import createMemoryStore from "memorystore";
 
@@ -88,8 +88,8 @@ export class DatabaseStorage implements IStorage {
       const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
       let orderByClause = desc(products.createdAt);
-      if (filters?.sort === 'price_asc') orderByClause = sql`${products.price} ASC`;
-      if (filters?.sort === 'price_desc') orderByClause = sql`${products.price} DESC`;
+      if (filters?.sort === 'price_asc') orderByClause = asc(products.price);
+      if (filters?.sort === 'price_desc') orderByClause = desc(products.price);
       if (filters?.sort === 'popular') orderByClause = desc(products.isPopular);
 
       const countResult = await db
