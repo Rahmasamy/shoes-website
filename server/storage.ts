@@ -74,9 +74,6 @@ export class DatabaseStorage implements IStorage {
 
   async getProducts(filters?: { category?: string; type?: string; sort?: string; search?: string; page?: number; limit?: number }): Promise<{ products: Product[]; total: number }> {
     try {
-      let query = db.select().from(products);
-      let countQuery = db.select({ count: sql<number>`count(*)` }).from(products);
-      
       const conditions = [];
       if (filters?.category) {
         conditions.push(eq(products.category, filters.category));
@@ -87,27 +84,30 @@ export class DatabaseStorage implements IStorage {
       if (filters?.search) {
         conditions.push(ilike(products.name, `%${filters.search}%`));
       }
-      
-      let orderBy = desc(products.createdAt);
-      if (filters?.sort === 'price_asc') orderBy = sql`${products.price} ASC`;
-      if (filters?.sort === 'price_desc') orderBy = sql`${products.price} DESC`;
-      if (filters?.sort === 'popular') orderBy = desc(products.isPopular);
 
-      if (conditions.length > 0) {
-        query = query.where(and(...conditions)) as any;
-        countQuery = countQuery.where(and(...conditions)) as any;
-      }
-      
-      const [countResult] = await countQuery;
-      const total = Number(countResult?.count || 0);
+      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-      let finalQuery = query.orderBy(orderBy);
+      let orderByClause = desc(products.createdAt);
+      if (filters?.sort === 'price_asc') orderByClause = sql`${products.price} ASC`;
+      if (filters?.sort === 'price_desc') orderByClause = sql`${products.price} DESC`;
+      if (filters?.sort === 'popular') orderByClause = desc(products.isPopular);
+
+      const countResult = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(products)
+        .where(whereClause);
+
+      const total = Number(countResult[0]?.count || 0);
+
+      const baseQuery = db.select().from(products).where(whereClause).orderBy(orderByClause);
+
       if (filters?.page && filters?.limit) {
         const offset = (filters.page - 1) * filters.limit;
-        finalQuery = finalQuery.limit(filters.limit).offset(offset) as any;
+        const productsResult = await baseQuery.limit(filters.limit).offset(offset);
+        return { products: productsResult, total };
       }
 
-      const productsResult = await finalQuery;
+      const productsResult = await baseQuery;
       return { products: productsResult, total };
     } catch (err: any) {
       console.error("Error in getProducts:", err);
@@ -116,9 +116,7 @@ export class DatabaseStorage implements IStorage {
           console.log("Database table missing in getProducts, triggering auto-seed...");
           const { seed } = await import("./seed");
           await seed();
-          // Retry query after seeding tables
-          const retryQuery = db.select().from(products);
-          const productsResult = await retryQuery;
+          const productsResult = await db.select().from(products);
           return { products: productsResult, total: productsResult.length };
         } catch (seedErr) {
           console.error("Auto-seed recovery failed:", seedErr);
