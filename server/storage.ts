@@ -146,8 +146,8 @@ export class DatabaseStorage implements IStorage {
 
   async getCartItems(userId: number): Promise<(CartItem & { product: Product })[]> {
     const items = await db.select({
-      cartItem: getTableColumns(cartItems),
-      product: getTableColumns(products)
+      cartItem: cartItems,
+      product: products
     })
     .from(cartItems)
     .innerJoin(products, eq(cartItems.productId, products.id))
@@ -192,8 +192,8 @@ export class DatabaseStorage implements IStorage {
 
   async getFavorites(userId: number): Promise<(Favorite & { product: Product })[]> {
     const items = await db.select({
-      favorite: getTableColumns(favorites),
-      product: getTableColumns(products)
+      favorite: favorites,
+      product: products
     })
     .from(favorites)
     .innerJoin(products, eq(favorites.productId, products.id))
@@ -283,8 +283,8 @@ export class DatabaseStorage implements IStorage {
     
     for (const order of userOrders) {
       const items = await db.select({
-        item: getTableColumns(orderItems),
-        product: getTableColumns(products)
+        item: orderItems,
+        product: products
       })
       .from(orderItems)
       .innerJoin(products, eq(orderItems.productId, products.id))
@@ -304,8 +304,8 @@ export class DatabaseStorage implements IStorage {
     
     for (const order of allOrders) {
       const items = await db.select({
-        item: getTableColumns(orderItems),
-        product: getTableColumns(products)
+        item: orderItems,
+        product: products
       })
       .from(orderItems)
       .innerJoin(products, eq(orderItems.productId, products.id))
