@@ -139,9 +139,9 @@ export async function createTables() {
       "price" NUMERIC NOT NULL,
       "category" TEXT NOT NULL,
       "type" TEXT NOT NULL,
-      "sizes" JSONB NOT NULL,
-      "colors" JSONB NOT NULL,
-      "images" JSONB NOT NULL,
+      "sizes" JSON NOT NULL,
+      "colors" JSON NOT NULL,
+      "images" JSON NOT NULL,
       "is_new" BOOLEAN DEFAULT FALSE,
       "is_popular" BOOLEAN DEFAULT FALSE,
       "created_at" TIMESTAMP DEFAULT NOW()
@@ -209,32 +209,63 @@ export async function seed() {
     console.error("Error creating tables:", err);
   }
 
+  // Check if products count is 0 and drop/re-create if empty table had mismatched schema
+  try {
+    const countRes = await db.select({ count: sql<number>`count(*)` }).from(products);
+    const totalCount = Number(countRes[0]?.count || 0);
+    if (totalCount === 0) {
+      console.log("Products table is empty. Recreating tables with matched JSON types...");
+      await db.execute(sql.raw(`
+        DROP TABLE IF EXISTS "products" CASCADE;
+        DROP TABLE IF EXISTS "users" CASCADE;
+        DROP TABLE IF EXISTS "reviews" CASCADE;
+        DROP TABLE IF EXISTS "cart_items" CASCADE;
+        DROP TABLE IF EXISTS "favorites" CASCADE;
+        DROP TABLE IF EXISTS "contacts" CASCADE;
+        DROP TABLE IF EXISTS "orders" CASCADE;
+        DROP TABLE IF EXISTS "order_items" CASCADE;
+      `));
+      await createTables();
+    }
+  } catch (e) {
+    console.error("Notice during table count check:", e);
+    await createTables();
+  }
+
   console.log("Seeding products...");
   for (const p of seedProducts) {
-    const existing = await db
-      .select()
-      .from(products)
-      .where(and(eq(products.name, p.name), eq(products.description, p.description)));
-    if (existing.length === 0) {
-      await db.insert(products).values(p);
-      console.log(`Seeded product: ${p.name}`);
-    } else {
-      await db.update(products).set({ price: p.price }).where(eq(products.id, existing[0].id));
-      console.log(`Updated product price: ${p.name} to ${p.price}`);
+    try {
+      const existing = await db
+        .select()
+        .from(products)
+        .where(and(eq(products.name, p.name), eq(products.description, p.description)));
+      if (existing.length === 0) {
+        await db.insert(products).values(p);
+        console.log(`Seeded product: ${p.name}`);
+      } else {
+        await db.update(products).set({ price: p.price }).where(eq(products.id, existing[0].id));
+        console.log(`Updated product price: ${p.name} to ${p.price}`);
+      }
+    } catch (prodErr) {
+      console.error(`Failed inserting product ${p.name}:`, prodErr);
     }
   }
 
   console.log("Seeding reviews...");
   for (const r of seedReviews) {
-    const existing = await db
-      .select()
-      .from(reviews)
-      .where(and(eq(reviews.name, r.name), eq(reviews.content, r.content)));
-    if (existing.length === 0) {
-      await db.insert(reviews).values(r);
-      console.log(`Seeded review from: ${r.name}`);
-    } else {
-      console.log(`Review from ${r.name} already exists`);
+    try {
+      const existing = await db
+        .select()
+        .from(reviews)
+        .where(and(eq(reviews.name, r.name), eq(reviews.content, r.content)));
+      if (existing.length === 0) {
+        await db.insert(reviews).values(r);
+        console.log(`Seeded review from: ${r.name}`);
+      } else {
+        console.log(`Review from ${r.name} already exists`);
+      }
+    } catch (revErr) {
+      console.error(`Failed inserting review ${r.name}:`, revErr);
     }
   }
 
