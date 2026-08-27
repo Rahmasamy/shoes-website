@@ -336,6 +336,14 @@ export async function seed() {
     }
   }
 
+  let finalCount = 0;
+  try {
+    const finalRes = await db.select({ count: sql<number>`count(*)` }).from(products);
+    finalCount = Number(finalRes[0]?.count || 0);
+  } catch (e) {
+    console.error("Error checking final count:", e);
+  }
+
   return {
     success: errors.length === 0,
     totalProductsInDatabase: finalCount,
