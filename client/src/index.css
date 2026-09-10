@@ -81,6 +81,175 @@
   animation: fade-in-up 0.6s ease-out forwards;
 }
 
+/* Marquee / thin animated header */
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+
+.marquee {
+  height: 40px;
+  overflow: hidden;
+  background: hsl(24, 97%, 45%); /* dark orange using accent color */
+}
+.marquee-inner {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  padding: 0;
+  color: hsl(var(--accent-foreground, 210 40% 98%));
+  font-weight: 700;
+  transform: translateX(0);
+  animation: marquee-scroll 14s linear infinite;
+}
+
+/* Each marquee-text should fill the viewport so text appears centered and continuous */
+.marquee-inner .marquee-text {
+  min-width: 100vw;
+  display: inline-block;
+  text-align: center;
+  padding: 0 1rem;
+  font-size: 0.98rem;
+}
+
+/* Reverse direction for RTL */
+[dir="rtl"] .marquee-inner {
+  animation-direction: reverse;
+}
+
+/* Promo button with shimmer/flicker */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); opacity: 0.7 }
+  50% { transform: translateX(0%); opacity: 1 }
+  100% { transform: translateX(100%); opacity: 0.7 }
+}
+
+.promo-button {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border-radius: 0.75rem;
+  color: white;
+  font-weight: 700;
+  text-align: center;
+  overflow: hidden;
+  background: hsl(24 97% 45%); /* default accent orange */
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+.promo-button--dark { background: #000; }
+.promo-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.18), rgba(255,255,255,0.05));
+  transform: translateX(-100%);
+  animation: shimmer 2.6s linear infinite;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+.promo-sub { font-size: 0.85rem; opacity: 0.95; margin-top: 0.35rem; }
+
+/* Compact promo pill for product cards */
+.promo-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+  border-radius: 999px;
+  color: white;
+  background: hsl(24 97% 45%); /* orange accent */
+  font-weight: 700;
+  box-shadow: 0 10px 30px rgba(255,130,30,0.18), 0 4px 10px rgba(255,130,30,0.08), 0 2px 6px rgba(0,0,0,0.08);
+  z-index: 30;
+  overflow: hidden;
+  transform: translateZ(0) scale3d(1,1,1);
+  animation: flicker 1.6s infinite ease-in-out;
+}
+.promo-pill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0.12), rgba(255,255,255,0.28), rgba(255,255,255,0.12));
+  transform: translateX(-140%);
+  animation: shimmer 1.6s linear infinite;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  border-radius: 999px;
+  opacity: 0.9;
+}
+
+.promo-pill::after {
+  /* orange flare pulse */
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 140%;
+  height: 200%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: radial-gradient(closest-side, rgba(255,140,40,0.25), rgba(255,140,40,0.06) 40%, rgba(255,140,40,0.0) 70%);
+  filter: blur(12px);
+  opacity: 0.6;
+  pointer-events: none;
+  border-radius: 999px;
+  animation: flare 1.6s infinite ease-in-out;
+}
+
+/* Branded image section styles */
+.brand-image-section {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.brand-image-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,0.55), rgba(255,140,40,0.12));
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+.brand-image-content { position: relative; z-index: 20; }
+.brand-image-title { color: white; text-shadow: 0 6px 20px rgba(0,0,0,0.6); }
+.brand-image-sub { color: rgba(255,255,255,0.9); }
+.brand-cta {
+  display: inline-block;
+  background: white;
+  color: hsl(24 97% 45%);
+  font-weight: 800;
+  padding: 0.7rem 1.25rem;
+  border-radius: 999px;
+  box-shadow: 0 8px 26px rgba(255,140,40,0.14);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.brand-cta:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(255,140,40,0.22); }
+
+
+@keyframes flicker {
+  0% { filter: brightness(1); box-shadow: 0 8px 22px rgba(255,130,30,0.14); transform: scale(1); }
+  20% { filter: brightness(1.12) saturate(1.05); box-shadow: 0 14px 40px rgba(255,130,30,0.26); transform: scale(1.03); }
+  45% { filter: brightness(0.92); box-shadow: 0 6px 12px rgba(0,0,0,0.06); transform: scale(0.995); }
+  70% { filter: brightness(1.18) saturate(1.08); box-shadow: 0 18px 52px rgba(255,130,30,0.32); transform: scale(1.05); }
+  100% { filter: brightness(1); box-shadow: 0 8px 22px rgba(255,130,30,0.14); transform: scale(1); }
+}
+
+@keyframes flare {
+  0% { opacity: 0.45; transform: translate(-50%, -50%) scale(0.95); }
+  50% { opacity: 0.9; transform: translate(-50%, -50%) scale(1.05); }
+  100% { opacity: 0.45; transform: translate(-50%, -50%) scale(0.95); }
+}
+
+[dir="rtl"] .promo-pill { right: auto; left: 0.75rem; }
+
+
 .delay-100 { animation-delay: 100ms; }
 .delay-200 { animation-delay: 200ms; }
 .delay-300 { animation-delay: 300ms; }

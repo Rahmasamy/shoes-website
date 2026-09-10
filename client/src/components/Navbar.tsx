@@ -7,6 +7,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 export function Navbar() {
   const { user, logoutMutation } = useAuth();
   const { data: cart } = useCart();
@@ -15,26 +17,29 @@ export function Navbar() {
 
   const cartCount = cart?.reduce((sum, item) => sum + item.quantity, 0) || 0;
    const LogoImage = "/assets/logo.png";
+  const { t } = useTranslation();
+  const bannerText = t("topBannerText");
+
   const NavLinks = () => (
     <>
       <Link href="/" className={`text-sm font-medium transition-colors hover:text-accent ${location === "/" ? "text-primary font-bold" : "text-muted-foreground"}`}>
-        Home
+        {t("Home")}
       </Link>
       <Link href="/shop?category=men" className={`text-sm font-medium transition-colors hover:text-accent ${location.includes("men") ? "text-primary font-bold" : "text-muted-foreground"}`}>
-        Men
+        {t("Men")}
       </Link>
       <Link href="/shop?category=women" className={`text-sm font-medium transition-colors hover:text-accent ${location.includes("women") ? "text-primary font-bold" : "text-muted-foreground"}`}>
-        Women
+        {t("Women")}
       </Link>
       <Link href="/shop?category=kids" className={`text-sm font-medium transition-colors hover:text-accent ${location.includes("kids") ? "text-primary font-bold" : "text-muted-foreground"}`}>
-        Kids
+        {t("Kids")}
       </Link>
       <Link href="/contact" className={`text-sm font-medium transition-colors hover:text-accent ${location === "/contact" ? "text-primary font-bold" : "text-muted-foreground"}`}>
-        Contact
+        {t("Contact")}
       </Link>
       {user?.role === "admin" && (
         <Link href="/admin" className={`text-sm font-medium transition-colors hover:text-accent ${location === "/admin" ? "text-primary font-bold" : "text-muted-foreground"}`}>
-          Dashboard
+          {t("Dashboard")}
         </Link>
       )}
     </>
@@ -69,7 +74,7 @@ export function Navbar() {
                         <p className="text-xs text-muted-foreground">{user.email}</p>
                       </div>
                     </div>
-                    <Button variant="outline" onClick={() => logoutMutation.mutate()}>Log out</Button>
+                    <Button variant="outline" onClick={() => logoutMutation.mutate()}>{t("Sign Out")}</Button>
                   </>
                 ) : (
                   <Link href="/auth" onClick={() => setIsOpen(false)}>
@@ -96,6 +101,7 @@ export function Navbar() {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          <LanguageSwitcher />
         
 
           {user && (
@@ -132,6 +138,13 @@ export function Navbar() {
           )}
         </div>
       </div>
+        {/* Thin animated marquee banner below navbar */}
+        <div className="marquee">
+          <div className="marquee-inner">
+            <span className="marquee-text">{bannerText}</span>
+            <span className="marquee-text">{bannerText}</span>
+          </div>
+        </div>
     </nav>
   );
 }

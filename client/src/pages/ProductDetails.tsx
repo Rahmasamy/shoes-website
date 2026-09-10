@@ -8,6 +8,7 @@ import { useState } from "react";
 import { ShoppingBag, Star, Check } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 export default function ProductDetails() {
   const [, params] = useRoute("/product/:id");
@@ -20,8 +21,10 @@ export default function ProductDetails() {
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [currentImage, setCurrentImage] = useState(0);
 
-  if (isLoading) return <div className="h-screen w-full flex items-center justify-center">Loading...</div>;
-  if (!product) return <div className="h-screen w-full flex items-center justify-center">Product not found</div>;
+  const { t } = useTranslation();
+
+  if (isLoading) return <div className="h-screen w-full flex items-center justify-center">{t("Loading")}</div>;
+  if (!product) return <div className="h-screen w-full flex items-center justify-center">{t("Product not found")}</div>;
 
   const handleAddToCart = () => {
     if (!selectedSize || !selectedColor) return;
@@ -87,14 +90,14 @@ export default function ProductDetails() {
               </div>
             </div>
 
-            <p className="text-3xl font-bold text-primary">{Number(product.price).toFixed(2)} EGP</p>
+            <p className="text-3xl font-bold text-primary">{Number(product.price).toFixed(2)} {t("currency")}</p>
 
             <p className="text-muted-foreground leading-relaxed">
               {product.description}
             </p>
 
             <div className="space-y-4">
-              <h3 className="font-bold">Select Color</h3>
+              <h3 className="font-bold">{t("Select Color")}</h3>
               <div className="flex gap-3">
                 {product.colors.map((color) => (
                   <button
@@ -113,7 +116,7 @@ export default function ProductDetails() {
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-bold">Select Size</h3>
+              <h3 className="font-bold">{t("Select Size")}</h3>
               <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
                 {product.sizes.map((size) => (
                   <button
@@ -139,9 +142,9 @@ export default function ProductDetails() {
                 disabled={!selectedSize || !selectedColor || addToCart.isPending}
                 onClick={handleAddToCart}
               >
-                {addToCart.isPending ? "Adding..." : (
+                {addToCart.isPending ? t("Adding") : (
                   <>
-                    <ShoppingBag className="mr-2 h-5 w-5" /> Add to Cart
+                    <ShoppingBag className="mr-2 h-5 w-5" /> {t("Add to Cart")}
                   </>
                 )}
               </Button>
@@ -151,11 +154,11 @@ export default function ProductDetails() {
                 className="flex-1 h-14 text-lg rounded-full border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700 dark:hover:bg-green-950/20"
                 onClick={handleWhatsApp}
               >
-                <FaWhatsapp className="mr-2 h-5 w-5" /> WhatsApp Inquiry
+                <FaWhatsapp className="mr-2 h-5 w-5" /> {t("WhatsApp Inquiry")}
               </Button>
             </div>
             {(!selectedSize || !selectedColor) && (
-              <p className="text-center text-sm text-destructive mt-2">Please select a size and color to add to cart</p>
+              <p className="text-center text-sm text-destructive mt-2">{t("selectSizeColorNotice")}</p>
             )}
           </div>
         </div>

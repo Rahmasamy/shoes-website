@@ -13,8 +13,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@shared/routes";
 import { useToast } from "@/hooks/use-toast";
 import { ShoppingBag, CreditCard, Truck, CheckCircle2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function Checkout() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { data: cart, isLoading: cartLoading } = useCart();
   const [, setLocation] = useLocation();
@@ -73,13 +75,12 @@ export default function Checkout() {
             <div className="h-24 w-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto animate-bounce">
               <CheckCircle2 className="h-12 w-12" />
             </div>
-            <h1 className="text-3xl font-display font-bold">Thank you for your order!</h1>
+            <h1 className="text-3xl font-display font-bold">{t("Thank you for your order!")}</h1>
             <p className="text-muted-foreground">
-              We've received your order and will begin processing it right away. 
-              You'll receive a confirmation email shortly.
+              {t("orderReceived")}
             </p>
             <Button onClick={() => setLocation("/")} size="lg" className="w-full">
-              Continue Shopping
+              {t("Continue Shopping")}
             </Button>
           </div>
         </main>
@@ -101,54 +102,54 @@ export default function Checkout() {
         <div className="flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto">
           {/* Checkout Form */}
           <div className="flex-1 space-y-6">
-            <h1 className="text-3xl font-display font-bold">Checkout</h1>
+            <h1 className="text-3xl font-display font-bold">{t("Checkout")}</h1>
             
             <form id="checkout-form" onSubmit={handleSubmit} className="space-y-6">
               <Card className="border-border/50 shadow-sm">
-                <CardHeader>
+                  <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Truck className="h-5 w-5 text-accent" />
-                    Shipping Information
+                    {t("Shipping Information")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="fullName">Full Name</Label>
+                    <Label htmlFor="fullName">{t("Full Name")}</Label>
                     <Input id="fullName" name="fullName" defaultValue={user?.fullName || ""} required placeholder="John Doe" />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="email">{t("Email")}</Label>
                       <Input id="email" name="email" type="email" defaultValue={user?.email || ""} required placeholder="john@example.com" />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number</Label>
+                      <Label htmlFor="phone">{t("Phone Number")}</Label>
                       <Input id="phone" name="phone" type="tel" required placeholder="+1 (555) 000-0000" />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="address">Address</Label>
+                    <Label htmlFor="address">{t("Address")}</Label>
                     <Input id="address" name="address" required placeholder="123 Street Name" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="city">City</Label>
+                    <Label htmlFor="city">{t("City")}</Label>
                     <Input id="city" name="city" required placeholder="New York" />
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="border-border/50 shadow-sm">
-                <CardHeader>
+                  <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <CreditCard className="h-5 w-5 text-accent" />
-                    Payment Method
+                    {t("Payment Method")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="p-4 rounded-lg border bg-accent/5 flex items-center justify-between">
                     <div>
-                      <p className="font-medium">Cash on Delivery</p>
-                      <p className="text-sm text-muted-foreground">Pay when your order arrives</p>
+                      <p className="font-medium">{t("Cash on Delivery")}</p>
+                      <p className="text-sm text-muted-foreground">{t("payWhenArrives")}</p>
                     </div>
                     <CheckCircle2 className="h-5 w-5 text-accent" />
                   </div>
@@ -160,10 +161,10 @@ export default function Checkout() {
           {/* Order Summary */}
           <div className="w-full lg:w-[380px]">
             <Card className="border-border/50 shadow-sm sticky top-24">
-              <CardHeader>
+                <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <ShoppingBag className="h-5 w-5 text-accent" />
-                  Order Summary
+                  {t("Order Summary")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -173,7 +174,7 @@ export default function Checkout() {
                       <img src={item.product.images[0]} className="h-12 w-12 rounded-md object-cover" />
                       <div className="flex-1">
                         <p className="font-medium line-clamp-1">{item.product.name}</p>
-                        <p className="text-muted-foreground">{item.quantity} x {item.product.price} EGP</p>
+                        <p className="text-muted-foreground">{item.quantity} x {item.product.price} {t("EGP")}</p>
                         <p className="text-[10px] uppercase text-accent font-bold">{item.size} • {item.color}</p>
                       </div>
                       <p className="font-bold">{(Number(item.product.price) * item.quantity).toFixed(2)} EGP</p>
@@ -185,16 +186,16 @@ export default function Checkout() {
                 
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Subtotal</span>
-                    <span>{subtotal.toFixed(2)} EGP</span>
+                    <span className="text-muted-foreground">{t("Subtotal")}</span>
+                    <span>{subtotal.toFixed(2)} {t("EGP")}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Shipping</span>
-                    <span>{shipping.toFixed(2)} EGP</span>
+                    <span className="text-muted-foreground">{t("Shipping")}</span>
+                    <span>{shipping.toFixed(2)} {t("EGP")}</span>
                   </div>
                   <div className="flex justify-between font-bold text-lg pt-2">
-                    <span>Total</span>
-                    <span className="text-primary">{total.toFixed(2)} EGP</span>
+                    <span>{t("Total")}</span>
+                    <span className="text-primary">{total.toFixed(2)} {t("EGP")}</span>
                   </div>
                 </div>
               </CardContent>
@@ -205,7 +206,7 @@ export default function Checkout() {
                   className="w-full h-12 text-lg shadow-lg shadow-primary/20"
                   disabled={createOrderMutation.isPending}
                 >
-                  {createOrderMutation.isPending ? "Processing..." : `Place Order • ${total.toFixed(2)} EGP`}
+                  {createOrderMutation.isPending ? t("Processing...") : `${t("Place Order")} • ${total.toFixed(2)} ${t("EGP")}`}
                 </Button>
               </CardFooter>
             </Card>

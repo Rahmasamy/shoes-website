@@ -15,7 +15,11 @@ export const seedProducts = [
     colors: ["brown", "black"],
     images: ["/uploads/1778422725511-842046646.jpeg"],
     isNew: true,
-    isPopular: false
+    isPopular: false,
+    translations: {
+      en: { name: "shoes", description: "shoes" },
+      ar: { name: "أحذية", description: "أحذية مريحة وعالية الجودة" }
+    }
   },
   {
     name: "Comfortable Woman shoe",
@@ -27,7 +31,11 @@ export const seedProducts = [
     colors: ["black"],
     images: ["/uploads/1778425770391-837241739.jpeg"],
     isNew: true,
-    isPopular: false
+    isPopular: false,
+    translations: {
+      en: { name: "Comfortable Woman shoe", description: "Chic & Comfortable Woman shoe with Black color" },
+      ar: { name: "حذاء نسائي مريح", description: "حذاء نسائي أنيق ومريح باللون الأسود" }
+    }
   },
   {
     name: "Shoe women's ",
@@ -39,7 +47,11 @@ export const seedProducts = [
     colors: ["black", "white"],
     images: ["/uploads/1778426152737-904026242.jpeg"],
     isNew: true,
-    isPopular: false
+    isPopular: false,
+    translations: {
+      en: { name: "Shoe women's ", description: "Shoe women's with Black color" },
+      ar: { name: "حذاء نسائي", description: "حذاء نسائي باللون الأسود" }
+    }
   },
   {
     name: "Slipper High-quality ",
@@ -51,7 +63,11 @@ export const seedProducts = [
     colors: ["Blue"],
     images: ["/uploads/1778426821114-959638512.jpeg"],
     isNew: true,
-    isPopular: false
+    isPopular: false,
+    translations: {
+      en: { name: "Slipper High-quality ", description: "High Quality Slipper with Blue color." },
+      ar: { name: "شبشب عالي الجودة", description: "شبشب عالي الجودة باللون الأزرق" }
+    }
   },
   {
     name: "Slipper  Women's High-quality ",
@@ -63,7 +79,11 @@ export const seedProducts = [
     colors: ["brown", "black"],
     images: ["/uploads/1778425996783-947901237.jpeg"],
     isNew: true,
-    isPopular: false
+    isPopular: false,
+    translations: {
+      en: { name: "Slipper  Women's High-quality ", description: "Chic Slipper  Women's High-quality " },
+      ar: { name: "شبشب نسائي عالي الجودة", description: "شبشب نسائي أنيق وعالي الجودة" }
+    }
   },
   {
     name: "Slipper High-quality ",
@@ -75,7 +95,11 @@ export const seedProducts = [
     colors: ["black"],
     images: ["/uploads/1778426344085-198928732.jpeg"],
     isNew: true,
-    isPopular: false
+    isPopular: false,
+    translations: {
+      en: { name: "Slipper High-quality ", description: "High Quality Slipper with Black color." },
+      ar: { name: "شبشب عالي الجودة", description: "شبشب عالي الجودة باللون الأسود" }
+    }
   },
   {
     name: "Medical Women shoes",
@@ -87,7 +111,11 @@ export const seedProducts = [
     colors: ["black"],
     images: ["/uploads/1778426551795-549870890.jpeg", "/uploads/1778427364888-272120266.jpeg"],
     isNew: true,
-    isPopular: false
+    isPopular: false,
+    translations: {
+      en: { name: "Medical Women shoes", description: "High Quality Medical Women shoes with All Colors." },
+      ar: { name: "أحذية طبية نسائية", description: "أحذية طبية نسائية عالية الجودة بعدة ألوان" }
+    }
   },
   {
     name: "Slipper High-quality Women's ",
@@ -99,7 +127,11 @@ export const seedProducts = [
     colors: ["Black"],
     images: ["/uploads/1778425539562-754335839.jpeg"],
     isNew: true,
-    isPopular: false
+    isPopular: false,
+    translations: {
+      en: { name: "Slipper High-quality Women's ", description: "Slipper High-quality Women's with black color" },
+      ar: { name: "شبشب نسائي عالي الجودة", description: "شبشب نسائي عالي الجودة باللون الأسود" }
+    }
   }
 ];
 
@@ -142,6 +174,7 @@ export async function createTables() {
       "sizes" JSONB NOT NULL,
       "colors" JSONB NOT NULL,
       "images" JSONB NOT NULL,
+      "translations" JSONB DEFAULT '{}',
       "is_new" BOOLEAN DEFAULT FALSE,
       "is_popular" BOOLEAN DEFAULT FALSE,
       "created_at" TIMESTAMP DEFAULT NOW()
@@ -164,6 +197,7 @@ export async function createTables() {
       "name" TEXT NOT NULL,
       "rating" INTEGER NOT NULL,
       "content" TEXT NOT NULL,
+      "translations" JSONB DEFAULT '{}',
       "avatar_url" TEXT,
       "created_at" TIMESTAMP DEFAULT NOW()
     );`,
@@ -172,6 +206,7 @@ export async function createTables() {
       "name" TEXT NOT NULL,
       "email" TEXT NOT NULL,
       "message" TEXT NOT NULL,
+      "translations" JSONB DEFAULT '{}',
       "created_at" TIMESTAMP DEFAULT NOW()
     );`,
     `CREATE TABLE IF NOT EXISTS "orders" (
@@ -247,12 +282,23 @@ export async function seed() {
         .from(products)
         .where(and(eq(products.name, p.name), eq(products.description, p.description)));
       if (existing.length === 0) {
-        await db.insert(products).values(p);
+        // add simple locale entries under translations (preserve provided translations)
+        const withTranslations = {
+          ...p,
+          translations: p.translations ? p.translations : {
+            en: { name: p.name, description: p.description },
+            ar: { name: p.name, description: p.description }
+          }
+        };
+        await db.insert(products).values(withTranslations);
         console.log(`Seeded product: ${p.name}`);
         logs.push(`Seeded product: ${p.name}`);
       } else {
-        await db.update(products).set({ price: p.price }).where(eq(products.id, existing[0].id));
-        console.log(`Updated product price: ${p.name} to ${p.price}`);
+        // Update price and optionally update translations if the seed entry provides them
+        const updateFields: any = { price: p.price };
+        if (p.translations) updateFields.translations = p.translations;
+        await db.update(products).set(updateFields).where(eq(products.id, existing[0].id));
+        console.log(`Updated product: ${p.name} (price and translations)`);
         logs.push(`Updated product: ${p.name}`);
       }
     } catch (prodErr: any) {

@@ -12,6 +12,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@shared/routes";
 import { Package, Users, ShoppingCart, MessageSquare, Plus, Mail, Upload, Edit2, X, ClipboardList, Phone, MapPin, CheckCircle, UserPlus } from "lucide-react";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { useEffect, useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
@@ -21,6 +22,7 @@ export default function AdminDashboard() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -176,9 +178,9 @@ export default function AdminDashboard() {
   const handleProductSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const data = {
-      name: formData.get("name"),
-      description: formData.get("description"),
+    const data: any = {
+      name: formData.get("name_en") || formData.get("name"),
+      description: formData.get("description_en") || formData.get("description"),
       price: formData.get("price"),
       category: formData.get("category"),
       type: formData.get("type"),
@@ -188,6 +190,20 @@ export default function AdminDashboard() {
       isNew: true,
       isPopular: false
     };
+
+    // Attach translations
+    const translations: any = {};
+    const nameEn = formData.get("name_en");
+    const descEn = formData.get("description_en");
+    const nameAr = formData.get("name_ar");
+    const descAr = formData.get("description_ar");
+    if (nameEn || descEn) translations.en = {};
+    if (nameEn) translations.en.name = String(nameEn);
+    if (descEn) translations.en.description = String(descEn);
+    if (nameAr || descAr) translations.ar = {};
+    if (nameAr) translations.ar.name = String(nameAr);
+    if (descAr) translations.ar.description = String(descAr);
+    if (Object.keys(translations).length > 0) data.translations = translations;
 
     if (editingProduct) {
       updateProductMutation.mutate({ id: editingProduct.id, data });
@@ -207,31 +223,31 @@ export default function AdminDashboard() {
   const pendingOrders = ordersList?.filter((o: any) => o.status === 'pending') || [];
 
   return (
-    <div className="min-h-screen bg-secondary/30">
+    <div className="min-h-screen bg-secondary/30" dir={i18n.dir(i18n.language)}>
       <Navbar />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-display font-bold">Admin Panel</h1>
+          <h1 className="text-3xl font-display font-bold">{t("Admin Panel")}</h1>
          
         </div>
 
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="bg-white/50 backdrop-blur-sm border p-1 rounded-xl shadow-sm sticky top-20 z-40 w-full lg:w-auto">
-            <TabsTrigger value="overview" className="rounded-lg flex-1 lg:flex-none">Overview</TabsTrigger>
-            <TabsTrigger value="users" className="rounded-lg flex-1 lg:flex-none">Users</TabsTrigger>
-            <TabsTrigger value="products" className="rounded-lg flex-1 lg:flex-none">Products</TabsTrigger>
-            <TabsTrigger value="orders" className="rounded-lg flex-1 lg:flex-none">
-              Orders {pendingOrders.length > 0 && <span className="ml-1 px-1.5 bg-accent text-accent-foreground text-[10px] rounded-full">{pendingOrders.length}</span>}
-            </TabsTrigger>
-            <TabsTrigger value="contacts" className="rounded-lg flex-1 lg:flex-none">Messages</TabsTrigger>
-          </TabsList>
+          <Tabs defaultValue="overview" className="space-y-6">
+            <TabsList className="bg-white/50 backdrop-blur-sm border p-1 rounded-xl shadow-sm sticky top-20 z-40 w-full lg:w-auto">
+              <TabsTrigger value="overview" className="rounded-lg flex-1 lg:flex-none">{t("Overview")}</TabsTrigger>
+              <TabsTrigger value="users" className="rounded-lg flex-1 lg:flex-none">{t("Users")}</TabsTrigger>
+              <TabsTrigger value="products" className="rounded-lg flex-1 lg:flex-none">{t("Products")}</TabsTrigger>
+              <TabsTrigger value="orders" className="rounded-lg flex-1 lg:flex-none">
+                {t("Orders")} {pendingOrders.length > 0 && <span className="ml-1 px-1.5 bg-accent text-accent-foreground text-[10px] rounded-full">{pendingOrders.length}</span>}
+              </TabsTrigger>
+              <TabsTrigger value="contacts" className="rounded-lg flex-1 lg:flex-none">{t("Messages")}</TabsTrigger>
+            </TabsList>
 
           <TabsContent value="overview">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Card className="border-border/50 shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Total Products</CardTitle>
+                  <CardTitle className="text-sm font-medium text-muted-foreground">{t("Total Products")}</CardTitle>
                   <Package className="h-4 w-4 text-blue-500" />
                 </CardHeader>
                 <CardContent>
@@ -240,7 +256,7 @@ export default function AdminDashboard() {
               </Card>
               <Card className="border-border/50 shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Registered Users</CardTitle>
+                  <CardTitle className="text-sm font-medium text-muted-foreground">{t("Registered Users")}</CardTitle>
                   <Users className="h-4 w-4 text-green-500" />
                 </CardHeader>
                 <CardContent>
@@ -249,7 +265,7 @@ export default function AdminDashboard() {
               </Card>
               <Card className="border-border/50 shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Pending Orders</CardTitle>
+                  <CardTitle className="text-sm font-medium text-muted-foreground">{t("Pending Orders")}</CardTitle>
                   <ClipboardList className="h-4 w-4 text-purple-500" />
                 </CardHeader>
                 <CardContent>
@@ -258,7 +274,7 @@ export default function AdminDashboard() {
               </Card>
               <Card className="border-border/50 shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Contact Messages</CardTitle>
+                  <CardTitle className="text-sm font-medium text-muted-foreground">{t("Contact Messages")}</CardTitle>
                   <MessageSquare className="h-4 w-4 text-orange-500" />
                 </CardHeader>
                 <CardContent>
@@ -272,25 +288,25 @@ export default function AdminDashboard() {
             <Card className="border-border/50 shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                  <CardTitle>Manage Users</CardTitle>
-                  <CardDescription>View and manage registered users in the system.</CardDescription>
+                  <CardTitle>{t("Manage Users")}</CardTitle>
+                  <CardDescription>{t("manageUsersDesc")}</CardDescription>
                 </div>
                 <Dialog open={isUserModalOpen} onOpenChange={setIsUserModalOpen}>
                   <DialogTrigger asChild>
                     <Button className="gap-2">
-                      <UserPlus className="h-4 w-4" /> Create User
+                      <UserPlus className="h-4 w-4" /> {t("Create User")}
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                      <DialogTitle>Create New User</DialogTitle>
+                      <DialogTitle>{t("Create New User")}</DialogTitle>
                       <DialogDescription>
-                        Add a new administrator or customer to the system.
+                        {t("createUserDesc")}
                       </DialogDescription>
                     </DialogHeader>
                     <form id="create-user-form" onSubmit={handleUserSubmit} className="space-y-4 py-4">
                       <div className="space-y-2">
-                        <Label htmlFor="fullName">Full Name</Label>
+                        <Label htmlFor="fullName">{t("Full Name")}</Label>
                         <Input id="fullName" name="fullName" required placeholder="John Doe" />
                       </div>
                       <div className="space-y-2">
@@ -319,9 +335,9 @@ export default function AdminDashboard() {
                       </div>
                     </form>
                     <DialogFooter>
-                      <Button variant="outline" onClick={() => setIsUserModalOpen(false)}>Cancel</Button>
+                      <Button variant="outline" onClick={() => setIsUserModalOpen(false)}>{t("Cancel")}</Button>
                       <Button form="create-user-form" type="submit" disabled={createUserMutation.isPending}>
-                        {createUserMutation.isPending ? "Creating..." : "Create User"}
+                        {createUserMutation.isPending ? t("Creating...") : t("Create User")}
                       </Button>
                     </DialogFooter>
                   </DialogContent>
@@ -367,10 +383,10 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
               <Card className="lg:col-span-1 border-border/50 shadow-sm h-fit lg:sticky lg:top-36 z-10">
                 <CardHeader className="flex flex-row items-center justify-between">
-                  <div>
-                    <CardTitle>{editingProduct ? "Edit Product" : "Add New Product"}</CardTitle>
-                    <CardDescription>Enter the sneakers details.</CardDescription>
-                  </div>
+                    <div>
+                        <CardTitle>{editingProduct ? t("Edit Product") : t("Add New Product")}</CardTitle>
+                        <CardDescription>{t("addNewProductDesc")}</CardDescription>
+                      </div>
                   {editingProduct && (
                     <Button variant="ghost" size="icon" onClick={() => setEditingProduct(null)}>
                       <X className="h-4 w-4" />
@@ -379,13 +395,25 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <CardContent>
                   <form key={editingProduct?.id || 'new'} onSubmit={handleProductSubmit} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Product Name</Label>
-                      <Input id="name" name="name" defaultValue={editingProduct?.name} required />
+                    <div className="space-y-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="name_en">Product Name (EN)</Label>
+                        <Input id="name_en" name="name_en" defaultValue={editingProduct?.translations?.en?.name || editingProduct?.name || ''} required />
+                      </div>
+                      <div>
+                        <Label htmlFor="name_ar">Product Name (AR)</Label>
+                        <Input id="name_ar" name="name_ar" defaultValue={editingProduct?.translations?.ar?.name || ''} />
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="description">Description</Label>
-                      <Textarea id="description" name="description" defaultValue={editingProduct?.description} required />
+                    <div className="space-y-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="description_en">Description (EN)</Label>
+                        <Textarea id="description_en" name="description_en" defaultValue={editingProduct?.translations?.en?.description || editingProduct?.description || ''} required />
+                      </div>
+                      <div>
+                        <Label htmlFor="description_ar">Description (AR)</Label>
+                        <Textarea id="description_ar" name="description_ar" defaultValue={editingProduct?.translations?.ar?.description || ''} />
+                      </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
@@ -411,13 +439,13 @@ export default function AdminDashboard() {
                       <Input id="type" name="type" defaultValue={editingProduct?.type} required placeholder="e.g. sneakers, running" />
                     </div>
                     <div className="space-y-3">
-                      <Label>Product Images</Label>
+                    <Label htmlFor="name_en">{t("Product Name (EN)")}</Label>
                       <div className="flex flex-wrap gap-3 mb-2">
                         {uploadedImages.map((url, idx) => (
                           <div key={idx} className="relative group border rounded-lg overflow-hidden w-20 h-20 bg-muted">
                             <img src={url} className="w-full h-full object-contain" />
-                            <button 
-                              type="button" 
+                            <button
+                              type="button"
                               onClick={() => setUploadedImages(prev => prev.filter((_, i) => i !== idx))}
                               className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 text-white transition-all"
                             >
@@ -425,7 +453,7 @@ export default function AdminDashboard() {
                             </button>
                           </div>
                         ))}
-                        <button 
+                        <button
                           type="button"
                           onClick={() => fileInputRef.current?.click()}
                           disabled={isUploading}
@@ -486,8 +514,8 @@ export default function AdminDashboard() {
 
               <Card className="lg:col-span-2 border-border/50 shadow-sm">
                 <CardHeader>
-                  <CardTitle>Existing Products</CardTitle>
-                  <CardDescription>View and manage current inventory.</CardDescription>
+                  <CardTitle>{t("Existing Products")}</CardTitle>
+                  <CardDescription>{t("existingProductsDesc")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Table>
@@ -508,7 +536,7 @@ export default function AdminDashboard() {
                               {p.name}
                             </div>
                           </TableCell>
-                          <TableCell className="capitalize">{p.category} • {p.type}</TableCell>
+                          <TableCell className="capitalize">{t(String(p.category).toLowerCase())} • {t(String(p.type).toLowerCase())}</TableCell>
                           <TableCell>{p.price} EGP</TableCell>
                           <TableCell className="text-right">
                             <Button variant="ghost" size="icon" onClick={() => setEditingProduct(p)}>
@@ -527,12 +555,12 @@ export default function AdminDashboard() {
           <TabsContent value="orders">
             <Card className="border-border/50 shadow-sm">
               <CardHeader>
-                <CardTitle>Pending Checkout Orders</CardTitle>
-                <CardDescription>Review and process active customer orders.</CardDescription>
+                <CardTitle>{t("Pending Checkout Orders")}</CardTitle>
+                <CardDescription>{t("pendingOrdersDesc")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {pendingOrders.length === 0 && <div className="text-center py-12 text-muted-foreground bg-secondary/20 rounded-2xl border-2 border-dashed">No pending orders.</div>}
+                  {pendingOrders.length === 0 && <div className="text-center py-12 text-muted-foreground bg-secondary/20 rounded-2xl border-2 border-dashed">{t("No pending orders.")}</div>}
                   {pendingOrders.map((order: any) => (
                     <Card key={order.id} className="overflow-hidden border-accent/20">
                       <div className="bg-accent/5 px-6 py-4 flex justify-between items-center border-b border-accent/10">
@@ -610,12 +638,13 @@ export default function AdminDashboard() {
           <TabsContent value="contacts">
             <Card className="border-border/50 shadow-sm">
               <CardHeader>
-                <CardTitle>Inquiries & Messages</CardTitle>
-                <CardDescription>Messages received from the contact form.</CardDescription>
+                <CardTitle>{t("Inquiries & Messages")}</CardTitle>
+                <CardDescription>{t("inquiriesDesc")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {contacts?.length === 0 && <div className="text-center py-8 text-muted-foreground">No messages found.</div>}
+                    {contacts?.length === 0 && <div className="text-center py-8 text-muted-foreground">{t("No messages found.")}</div>}
                   {contacts?.map((c: any) => (
                     <div key={c.id} className="p-4 rounded-xl border bg-white/50 space-y-2">
                       <div className="flex justify-between items-start">

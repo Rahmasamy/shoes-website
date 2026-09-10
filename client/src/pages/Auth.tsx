@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import { Navbar } from "@/components/Navbar";
 
 export default function Auth() {
   const { loginMutation, registerMutation, user } = useAuth();
+  const { t } = useTranslation();
   const [location, setLocation] = useLocation();
 
   // Redirect based on role if logged in
@@ -50,28 +52,28 @@ export default function Auth() {
       <div className="flex-1 flex items-center justify-center p-4">
         <Card className="w-full max-w-md shadow-xl border-border/50">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-display font-bold">Welcome to Karawan</CardTitle>
-            <CardDescription>Join the community of sneaker enthusiasts</CardDescription>
+            <CardTitle className="text-2xl font-display font-bold">{t("welcomeTitle")}</CardTitle>
+            <CardDescription>{t("welcomeDesc")}</CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="login">
-              <TabsList className="grid w-full grid-cols-2 mb-8">
-                <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="register">Register</TabsTrigger>
-              </TabsList>
+                <TabsList className="grid w-full grid-cols-2 mb-8">
+                <TabsTrigger value="login">{t("Login")}</TabsTrigger>
+                <TabsTrigger value="register">{t("Register")}</TabsTrigger>
+                </TabsList>
               
               <TabsContent value="login">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="login-username">Username</Label>
+                    <Label htmlFor="login-username">{t("Username")}</Label>
                     <Input id="login-username" name="username" required className="rounded-lg" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="login-password">Password</Label>
+                    <Label htmlFor="login-password">{t("Password")}</Label>
                     <Input id="login-password" name="password" type="password" required className="rounded-lg" />
                   </div>
                   <Button type="submit" className="w-full mt-4" disabled={loginMutation.isPending}>
-                    {loginMutation.isPending ? "Logging in..." : "Login"}
+                    {loginMutation.isPending ? t("Logging in...") : t("Login")}
                   </Button>
                 </form>
               </TabsContent>
@@ -79,23 +81,23 @@ export default function Auth() {
               <TabsContent value="register">
                 <form onSubmit={handleRegister} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="reg-fullName">Full Name</Label>
+                    <Label htmlFor="reg-fullName">{t("Full Name")}</Label>
                     <Input id="reg-fullName" name="fullName" required className="rounded-lg" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="reg-username">Username</Label>
+                    <Label htmlFor="reg-username">{t("Username")}</Label>
                     <Input id="reg-username" name="username" required className="rounded-lg" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="reg-email">Email</Label>
+                    <Label htmlFor="reg-email">{t("Email")}</Label>
                     <Input id="reg-email" name="email" type="email" required className="rounded-lg" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="reg-password">Password</Label>
+                    <Label htmlFor="reg-password">{t("Password")}</Label>
                     <Input id="reg-password" name="password" type="password" required className="rounded-lg" />
                   </div>
                   <Button type="submit" className="w-full mt-4" disabled={registerMutation.isPending}>
-                    {registerMutation.isPending ? "Creating account..." : "Create Account"}
+                    {registerMutation.isPending ? t("Creating account...") : t("Create Account")}
                   </Button>
                 </form>
               </TabsContent>

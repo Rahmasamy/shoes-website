@@ -85,13 +85,51 @@ export async function registerRoutes(
   app.get(api.products.list.path, asyncHandler(async (req, res) => {
     const parsed = api.products.list.input ? api.products.list.input.parse(req.query) : req.query;
     const result = await storage.getProducts(parsed);
-    res.json(result);
+    // Locale selection: `lang` query param or Accept-Language header (first language)
+    const lang = (req.query.lang as string) || (() => {
+      const al = req.headers['accept-language'];
+      if (!al) return 'en';
+      return String(al).split(',')[0].split('-')[0];
+    })();
+
+    const localizedProducts = result.products.map((p: any) => {
+      try {
+        const translations = p.translations || {};
+        const locale = translations[lang] || {};
+        return {
+          ...p,
+          name: locale.name || p.name,
+          description: locale.description || p.description,
+        };
+      } catch (e) {
+        return p;
+      }
+    });
+
+    res.json({ ...result, products: localizedProducts });
   }));
 
   app.get(api.products.get.path, asyncHandler(async (req, res) => {
     const product = await storage.getProduct(Number(req.params.id));
     if (!product) return res.status(404).json({ message: "Product not found" });
-    res.json(product);
+    const lang = (req.query.lang as string) || (() => {
+      const al = req.headers['accept-language'];
+      if (!al) return 'en';
+      return String(al).split(',')[0].split('-')[0];
+    })();
+
+    try {
+      const translations = (product as any).translations || {};
+      const locale = translations[lang] || {};
+      const localized = {
+        ...product,
+        name: locale.name || (product as any).name,
+        description: locale.description || (product as any).description,
+      };
+      res.json(localized);
+    } catch (e) {
+      res.json(product);
+    }
   }));
 
   // Cart
@@ -129,12 +167,28 @@ export async function registerRoutes(
   // Reviews
   app.get(api.reviews.list.path, async (req, res) => {
     const reviews = await storage.getReviews();
-    res.json(reviews);
+    const lang = (req.query.lang as string) || (() => {
+      const al = req.headers['accept-language'];
+      if (!al) return 'en';
+      return String(al).split(',')[0].split('-')[0];
+    })();
+
+    const localized = reviews.map((r: any) => {
+      try {
+        const translations = r.translations || {};
+        const locale = translations[lang] || {};
+        return { ...r, content: locale.content || r.content };
+      } catch (e) { return r; }
+    });
+
+    res.json(localized);
   });
 
   // Contact
   app.post(api.contact.submit.path, async (req, res) => {
-    const contact = await storage.createContact(req.body);
+    // Allow optional translations in request body
+    const contactPayload = req.body;
+    const contact = await storage.createContact(contactPayload);
     res.status(201).json(contact);
   });
 
@@ -146,7 +200,21 @@ export async function registerRoutes(
 
   app.get(api.admin.contacts.path, requireAdmin, async (req, res) => {
     const contacts = await storage.getContacts();
-    res.json(contacts);
+    const lang = (req.query.lang as string) || (() => {
+      const al = req.headers['accept-language'];
+      if (!al) return 'en';
+      return String(al).split(',')[0].split('-')[0];
+    })();
+
+    const localized = contacts.map((c: any) => {
+      try {
+        const translations = c.translations || {};
+        const locale = translations[lang] || {};
+        return { ...c, message: locale.message || c.message };
+      } catch (e) { return c; }
+    });
+
+    res.json(localized);
   });
 
   app.post(api.admin.createProduct.path, requireAdmin, async (req, res) => {

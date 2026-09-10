@@ -23,6 +23,7 @@ export const products = pgTable("products", {
   sizes: jsonb("sizes").$type<string[]>().notNull(),
   colors: jsonb("colors").$type<string[]>().notNull(),
   images: jsonb("images").$type<string[]>().notNull(),
+  translations: jsonb("translations").$type<Record<string, { name?: string; description?: string }>>().default({}),
   isNew: boolean("is_new").default(false),
   isPopular: boolean("is_popular").default(false),
   createdAt: timestamp("created_at").defaultNow(),
@@ -49,6 +50,7 @@ export const reviews = pgTable("reviews", {
   rating: integer("rating").notNull(),
   content: text("content").notNull(),
   avatarUrl: text("avatar_url"),
+  translations: jsonb("translations").$type<Record<string, { content?: string }>>().default({}),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -57,6 +59,7 @@ export const contacts = pgTable("contacts", {
   name: text("name").notNull(),
   email: text("email").notNull(),
   message: text("message").notNull(),
+  translations: jsonb("translations").$type<Record<string, { message?: string }>>().default({}),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

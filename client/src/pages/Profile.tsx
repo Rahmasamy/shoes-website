@@ -5,10 +5,12 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTranslation } from "react-i18next";
 
 export default function Profile() {
   const { user, logoutMutation } = useAuth();
   const [, setLocation] = useLocation();
+  const { t } = useTranslation();
 
   if (!user) {
     setLocation("/auth");
@@ -46,7 +48,7 @@ export default function Profile() {
                   className="w-full"
                   onClick={() => logoutMutation.mutate()}
                 >
-                  Log Out
+                  {t("Sign Out")}
                 </Button>
               </div>
             </Card>

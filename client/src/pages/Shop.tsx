@@ -12,6 +12,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Filter, X, Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export default function Shop() {
@@ -34,6 +35,8 @@ export default function Shop() {
     setFilters(updater);
     setPage(1);
   };
+
+  const { t } = useTranslation();
 
   // Sync category from URL
   useEffect(() => {
@@ -73,15 +76,15 @@ export default function Shop() {
   const SidebarContent = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="font-bold text-lg">Filters</h3>
+        <h3 className="font-bold text-lg">{t("Filters")}</h3>
         <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground hover:text-primary">
-          Clear All
+          {t("Clear All")}
         </Button>
       </div>
 
       <Accordion type="multiple" defaultValue={["category", "type", "price"]}>
         <AccordionItem value="category">
-          <AccordionTrigger>Category</AccordionTrigger>
+            <AccordionTrigger>{t("Category")}</AccordionTrigger>
           <AccordionContent>
             <div className="space-y-2">
               {['men', 'women', 'kids'].map((cat) => (
@@ -91,7 +94,7 @@ export default function Shop() {
                     checked={filters.category === cat}
                     onCheckedChange={(checked) => updateFilters(f => ({ ...f, category: checked ? cat as any : undefined }))}
                   />
-                  <Label htmlFor={`cat-${cat}`} className="capitalize cursor-pointer">{cat}</Label>
+                    <Label htmlFor={`cat-${cat}`} className="capitalize cursor-pointer">{t(cat)}</Label>
                 </div>
               ))}
             </div>
@@ -99,7 +102,7 @@ export default function Shop() {
         </AccordionItem>
 
         <AccordionItem value="type">
-          <AccordionTrigger>Type</AccordionTrigger>
+          <AccordionTrigger>{t("Type")}</AccordionTrigger>
           <AccordionContent>
             <div className="space-y-2">
               {['sneakers', 'boots', 'running', 'casual'].map((type) => (
@@ -109,7 +112,7 @@ export default function Shop() {
                     checked={filters.type === type}
                     onCheckedChange={(checked) => updateFilters(f => ({ ...f, type: checked ? type : "" }))}
                   />
-                  <Label htmlFor={`type-${type}`} className="capitalize cursor-pointer">{type}</Label>
+                  <Label htmlFor={`type-${type}`} className="capitalize cursor-pointer">{t(type)}</Label>
                 </div>
               ))}
             </div>
@@ -125,12 +128,12 @@ export default function Shop() {
       
       <main className="flex-1 container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-display font-bold capitalize">
-              {filters.category ? `${filters.category}'s Collection` : 'All Products'}
+              {filters.category ? t("categoryCollection", { category: t(filters.category || "") }) : t("All Products")}
             </h1>
-            <p className="text-muted-foreground">{total} products found</p>
+            <p className="text-muted-foreground">{total} {t("productsFound")}</p>
           </div>
 
           <div className="flex items-center gap-4 w-full md:w-auto">
@@ -138,7 +141,7 @@ export default function Shop() {
             <div className="relative flex-1 md:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
-                placeholder="Search products..." 
+                placeholder={t("searchPlaceholder")} 
                 className="pl-9 rounded-full"
                 value={filters.search}
                 onChange={(e) => updateFilters(f => ({ ...f, search: e.target.value }))}
@@ -165,10 +168,10 @@ export default function Shop() {
               value={filters.sort}
               onChange={(e) => updateFilters(f => ({ ...f, sort: e.target.value as any }))}
             >
-              <option value="newest">Newest</option>
-              <option value="popular">Most Popular</option>
-              <option value="price_asc">Price: Low to High</option>
-              <option value="price_desc">Price: High to Low</option>
+              <option value="newest">{t("Newest")}</option>
+              <option value="popular">{t("Most Popular")}</option>
+              <option value="price_asc">{t("Price: Low to High")}</option>
+              <option value="price_desc">{t("Price: High to Low")}</option>
             </select>
           </div>
         </div>
@@ -191,9 +194,9 @@ export default function Shop() {
               </div>
             ) : products?.length === 0 ? (
               <div className="text-center py-24">
-                <h3 className="text-2xl font-bold mb-2">No products found</h3>
-                <p className="text-muted-foreground mb-6">Try adjusting your filters or search terms.</p>
-                <Button onClick={clearFilters}>Clear Filters</Button>
+                <h3 className="text-2xl font-bold mb-2">{t("noProductsTitle")}</h3>
+                <p className="text-muted-foreground mb-6">{t("noProductsDesc")}</p>
+                <Button onClick={clearFilters}>{t("Clear Filters")}</Button>
               </div>
             ) : (
               <>
@@ -215,7 +218,7 @@ export default function Shop() {
                       onClick={() => handlePageChange(page - 1)}
                       disabled={page === 1}
                     >
-                      Previous
+                      {t("Previous")}
                     </Button>
                     
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
@@ -234,7 +237,7 @@ export default function Shop() {
                       onClick={() => handlePageChange(page + 1)}
                       disabled={page === totalPages}
                     >
-                      Next
+                      {t("Next")}
                     </Button>
                   </div>
                 )}

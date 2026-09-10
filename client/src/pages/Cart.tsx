@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { useCart, useUpdateCartItem, useRemoveFromCart } from "@/hooks/use-cart";
 import { Button } from "@/components/ui/button";
 import { Trash2, Minus, Plus, ArrowRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function Cart() {
   const { data: cart, isLoading } = useCart();
@@ -14,14 +15,16 @@ export default function Cart() {
   const shipping = subtotal > 150 ? 0 : 15;
   const total = subtotal + shipping;
 
-  if (isLoading) return <div className="h-screen flex items-center justify-center">Loading...</div>;
+  const { t } = useTranslation();
+
+  if (isLoading) return <div className="h-screen flex items-center justify-center">{t("Loading")}</div>;
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
       <main className="flex-1 container mx-auto px-4 py-12">
-        <h1 className="text-3xl font-display font-bold mb-8">Shopping Cart</h1>
+        <h1 className="text-3xl font-display font-bold mb-8">{t("Shopping Cart")}</h1>
 
         {cart && cart.length > 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -81,38 +84,45 @@ export default function Cart() {
             {/* Summary */}
             <div className="lg:col-span-1">
               <div className="bg-card p-6 rounded-2xl border border-border shadow-sm sticky top-24">
-                <h3 className="font-bold text-xl mb-6">Order Summary</h3>
+                <h3 className="font-bold text-xl mb-6">{t("Order Summary")}</h3>
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Subtotal</span>
-                    <span className="font-medium">{subtotal.toFixed(2)} EGP</span>
+                    <span className="text-muted-foreground">{t("Subtotal")}</span>
+                    <span className="font-medium">{subtotal.toFixed(2)} {t("currency")}</span>
+                  </div>
+                  {/* Promotional offer button: Buy 3 Pay 2 */}
+                  <div>
+                    <button type="button" className="promo-button promo-button--dark mb-3" onClick={() => {/* placeholder for promo action */}}>
+                      {t("buy3pay2")}
+                    </button>
+                    <div className="promo-sub text-muted-foreground">{t("buy3pay2Sub")}</div>
                   </div>
                   {/* <div className="flex justify-between">
                     <span className="text-muted-foreground">Shipping</span>
                     <span className="font-medium">{shipping === 0 ? "Free" : `${shipping.toFixed(2)} EGP`}</span>
                   </div> */}
                   <div className="border-t pt-4 flex justify-between">
-                    <span className="font-bold text-lg">Total</span>
-                    <span className="font-bold text-lg text-primary">{total.toFixed(2)} EGP</span>
+                    <span className="font-bold text-lg">{t("Total")}</span>
+                    <span className="font-bold text-lg text-primary">{total.toFixed(2)} {t("currency")}</span>
                   </div>
                 </div>
                 <Link href="/checkout">
                   <Button className="w-full h-12 rounded-xl text-lg font-bold">
-                    Checkout <ArrowRight className="ml-2 h-5 w-5" />
+                    {t("Checkout")} <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
                 <p className="text-xs text-center text-muted-foreground mt-4">
-                  Secure checkout powered by Stripe
+                  {t("secureCheckout")}
                 </p>
               </div>
             </div>
           </div>
         ) : (
           <div className="text-center py-24 bg-secondary/30 rounded-3xl">
-            <h2 className="text-2xl font-bold mb-4">Your cart is empty</h2>
-            <p className="text-muted-foreground mb-8">Looks like you haven't added any shoes yet.</p>
+            <h2 className="text-2xl font-bold mb-4">{t("cartEmptyTitle")}</h2>
+            <p className="text-muted-foreground mb-8">{t("cartEmptyDesc")}</p>
             <Link href="/shop">
-              <Button size="lg" className="rounded-full">Start Shopping</Button>
+              <Button size="lg" className="rounded-full">{t("Start Shopping")}</Button>
             </Link>
           </div>
         )}

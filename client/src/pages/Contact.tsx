@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertContactSchema, type InsertContact } from "@shared/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -13,6 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Phone, MapPin, MessageCircle } from "lucide-react";
 
 export default function Contact() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -49,9 +51,9 @@ export default function Contact() {
           
           <div className="space-y-8">
             <div>
-              <h1 className="text-4xl font-display font-bold mb-4">Get in Touch</h1>
+              <h1 className="text-4xl font-display font-bold mb-4">{t("getInTouch")}</h1>
               <p className="text-muted-foreground text-lg">
-                Have a question about your order or our products? We're here to help.
+                {t("contactHelp")}
               </p>
             </div>
 
@@ -61,7 +63,7 @@ export default function Contact() {
 <MessageCircle className="h-5 w-5" />         
        </div>
                 <div>
-                  <h3 className="font-bold">Whatsapp</h3>
+                  <h3 className="font-bold">{t("Whatsapp")}</h3>
                   <p className="text-muted-foreground">
                     01004642036
                   </p>
@@ -72,7 +74,7 @@ export default function Contact() {
                   <Phone className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold"> Direct Call </h3>
+                  <h3 className="font-bold">{t("Direct Call")}</h3>
                   <p className="text-muted-foreground">
                     01070740831
                   </p>
@@ -84,7 +86,7 @@ export default function Contact() {
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold">Visit Us</h3>
+                  <h3 className="font-bold">{t("Visit Us")}</h3>
                   <p className="text-muted-foreground">
                     7أ يوسف نجيب أمام جراج العتبة ميدان العتبة
                   </p>
@@ -101,9 +103,9 @@ export default function Contact() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Name</FormLabel>
+                      <FormLabel>{t("Full Name")}</FormLabel>
                       <FormControl>
-                        <Input placeholder="John Doe" {...field} className="rounded-xl" />
+                        <Input placeholder={t("placeholderName") || "John Doe"} {...field} className="rounded-xl" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -114,9 +116,9 @@ export default function Contact() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t("Email")}</FormLabel>
                       <FormControl>
-                        <Input placeholder="john@example.com" {...field} className="rounded-xl" />
+                        <Input placeholder={t("placeholderEmail") || "john@example.com"} {...field} className="rounded-xl" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -127,10 +129,10 @@ export default function Contact() {
                   name="message"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Message</FormLabel>
+                      <FormLabel>{t("Message")}</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          placeholder="How can we help you?" 
+                          <Textarea 
+                            placeholder={t("messagePlaceholder") || "How can we help you?"} 
                           className="min-h-[150px] rounded-xl" 
                           {...field} 
                         />
@@ -144,7 +146,7 @@ export default function Contact() {
                   className="w-full h-12 rounded-xl text-lg font-bold" 
                   disabled={mutation.isPending}
                 >
-                  {mutation.isPending ? "Sending..." : "Send Message"}
+                  {mutation.isPending ? t("Sending...") : t("Send Message")}
                 </Button>
               </form>
             </Form>
