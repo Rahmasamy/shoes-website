@@ -9,5 +9,4 @@ README.md
 .DS_Store
 coverage
 .turbo
-migrations
 .vite
