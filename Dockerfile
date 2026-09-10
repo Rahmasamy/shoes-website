@@ -34,6 +34,9 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/uploads ./uploads
 COPY --from=builder /app/uploads ./uploads_backup
+# Copy Drizzle config and migrations so runtime can run pre-deploy migrations
+COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
+COPY --from=builder /app/migrations ./migrations
 
 # Create non-root user for security and set permissions
 RUN addgroup -g 1001 -S nodejs && \
