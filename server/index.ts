@@ -71,8 +71,12 @@ app.use((req, res, next) => {
 
 (async () => {
   try {
-    const { seed } = await import("./seed");
-    await seed();
+    if (process.env.RUN_SEED === "true") {
+      const { seed } = await import("./seed");
+      await seed();
+    } else {
+      console.log('Auto-seed skipped (RUN_SEED!=true)');
+    }
   } catch (err) {
     console.error("Auto-seeding error during startup:", err);
   }
