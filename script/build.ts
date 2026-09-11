@@ -58,6 +58,21 @@ async function buildAll() {
     external: externals,
     logLevel: "info",
   });
+  // Bundle the seeder so it can run in the runtime image without tsx installed
+  await esbuild({
+    entryPoints: ["server/seed.ts"],
+    platform: "node",
+    bundle: true,
+    format: "cjs",
+    outfile: "dist/seed.cjs",
+    define: {
+      "process.env.NODE_ENV": '"production"',
+    },
+    minify: false,
+    keepNames: true,
+    external: externals,
+    logLevel: "info",
+  });
 }
 
 buildAll()
