@@ -138,7 +138,7 @@ export default function ProductDetails() {
             <div className="pt-8 border-t border-border flex flex-col sm:flex-row gap-4">
               <Button 
                 size="lg" 
-                className="flex-1 h-14 text-lg text-black rounded-full"
+                className="flex-1 h-14 text-lg rounded-full bg-black text-white hover:bg-neutral-800 dark:bg-black dark:text-white dark:hover:bg-neutral-800"
                 disabled={!selectedSize || !selectedColor || addToCart.isPending}
                 onClick={handleAddToCart}
               >
