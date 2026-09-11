@@ -44,8 +44,6 @@ RUN addgroup -g 1001 -S nodejs && \
     mkdir -p /app/uploads && \
     chown -R nodejs:nodejs /app
 
-USER nodejs
-
 # Expose port
 EXPOSE 5000
 
@@ -56,9 +54,13 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
 # Copy entrypoint and make executable
 COPY --from=builder /app/docker-entrypoint.sh ./docker-entrypoint.sh
 RUN chmod +x ./docker-entrypoint.sh
+RUN chown nodejs:nodejs ./docker-entrypoint.sh && chown -R nodejs:nodejs /app
 
 # Use dumb-init with our entrypoint to handle signals and optionally run migrations/seed
 ENTRYPOINT ["dumb-init", "--", "./docker-entrypoint.sh"]
+
+# Switch to non-root user
+USER nodejs
 
 # Start the application (passed to entrypoint)
 CMD ["node", "dist/index.cjs"]
