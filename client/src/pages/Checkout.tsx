@@ -45,7 +45,10 @@ export default function Checkout() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderData),
       });
-      if (!res.ok) throw new Error("Order creation failed");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || "Order creation failed");
+      }
       return res.json();
     },
     onSuccess: () => {
