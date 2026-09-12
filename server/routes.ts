@@ -133,36 +133,36 @@ export async function registerRoutes(
   }));
 
   // Cart
-  app.get(api.cart.list.path, requireAuth, async (req, res) => {
+  app.get(api.cart.list.path, requireAuth, asyncHandler(async (req, res) => {
     const items = await storage.getCartItems(req.user!.id);
     res.json(items);
-  });
+  }));
 
-  app.post(api.cart.add.path, requireAuth, async (req, res) => {
+  app.post(api.cart.add.path, requireAuth, asyncHandler(async (req, res) => {
     const item = await storage.addToCart(req.user!.id, req.body);
     res.status(201).json(item);
-  });
+  }));
 
-  app.patch(api.cart.update.path, requireAuth, async (req, res) => {
+  app.patch(api.cart.update.path, requireAuth, asyncHandler(async (req, res) => {
     const item = await storage.updateCartItem(Number(req.params.id), req.body.quantity);
     res.json(item);
-  });
+  }));
 
-  app.delete(api.cart.delete.path, requireAuth, async (req, res) => {
+  app.delete(api.cart.delete.path, requireAuth, asyncHandler(async (req, res) => {
     await storage.removeFromCart(Number(req.params.id));
     res.status(204).send();
-  });
+  }));
 
   // Favorites
-  app.get(api.favorites.list.path, requireAuth, async (req, res) => {
+  app.get(api.favorites.list.path, requireAuth, asyncHandler(async (req, res) => {
     const items = await storage.getFavorites(req.user!.id);
     res.json(items);
-  });
+  }));
 
-  app.post(api.favorites.toggle.path, requireAuth, async (req, res) => {
+  app.post(api.favorites.toggle.path, requireAuth, asyncHandler(async (req, res) => {
     const result = await storage.toggleFavorite(req.user!.id, req.body.productId);
     res.json(result);
-  });
+  }));
 
   // Reviews
   app.get(api.reviews.list.path, async (req, res) => {
@@ -295,7 +295,7 @@ export async function registerRoutes(
   });
 
   // Orders
-  app.post(api.orders.create.path, requireAuth, async (req, res) => {
+  app.post(api.orders.create.path, requireAuth, asyncHandler(async (req, res) => {
     const parsed = api.orders.create.input.parse(req.body);
     const { items, ...orderData } = parsed;
     const order = await storage.createOrder({
@@ -303,12 +303,12 @@ export async function registerRoutes(
       userId: req.user!.id
     }, items);
     res.status(201).json(order);
-  });
+  }));
 
-  app.get(api.orders.list.path, requireAuth, async (req, res) => {
+  app.get(api.orders.list.path, requireAuth, asyncHandler(async (req, res) => {
     const orders = await storage.getOrders(req.user!.id);
     res.json(orders);
-  });
+  }));
 
   // Manual seed endpoint
   app.get("/api/seed", async (_req, res) => {

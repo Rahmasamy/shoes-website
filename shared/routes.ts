@@ -154,7 +154,7 @@ export const api = {
     create: {
       method: 'POST' as const,
       path: '/api/orders',
-      input: insertOrderSchema.omit({ totalAmount: true }).extend({
+      input: insertOrderSchema.omit({ userId: true, totalAmount: true }).extend({
         items: z.array(insertOrderItemSchema.omit({ orderId: true, price: true }))
       }),
       responses: {
